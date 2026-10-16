@@ -1,4 +1,4 @@
-# Modularización del Sistema de Freno en SysML v2
+# Modularización del Sistema de Freno en SysML v2 "cambio prueba aime"
 
 Este módulo divide el modelo del sistema de frenado en dos archivos desacoplados siguiendo el estándar de **SysML v2**: **Definiciones reutilizables** y **Arquitectura / Ensamblado**.
 
