@@ -1,5 +1,9 @@
 # Guía Completa: Despliegue de Eclipse SysON (SysML v2) en Windows desde Cero
 
+
+
+# COMO INSTALAR DESDE 0 TODO
+
 Esta guía describe paso a paso cómo preparar tu entorno de Windows, instalar los requisitos necesarios (WSL 2 y Docker Desktop), configurar los contenedores y crear tu primer proyecto de modelado **SysML v2** con **Eclipse SysON**.
 
 ---
