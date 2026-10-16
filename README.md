@@ -10,7 +10,7 @@ Esta guía describe paso a paso cómo preparar tu entorno de Windows, instalar l
 
 ## Índice
 1. [Fase 1: Preparación del Sistema e Instalación](#fase-1-preparación-del-sistema-e-instalación)
-   - [1.1 Virtualización en BIOS](#11-virtualización-en-bios)
+   
    - [1.2 Instalar WSL 2 (Subsistema de Windows para Linux)](#12-instalar-wsl-2-subsistema-de-windows-para-linux)
    - [1.3 Instalar Docker Desktop](#13-instalar-docker-desktop)
 2. [Fase 2: Estructura de Archivos y Configuración](#fase-2-estructura-de-archivos-y-configuración)
@@ -27,12 +27,7 @@ Esta guía describe paso a paso cómo preparar tu entorno de Windows, instalar l
 
 ## Fase 1: Preparación del Sistema e Instalación
 
-### 1.1 Virtualización en BIOS
-Docker en Windows necesita que la virtualización por hardware esté habilitada:
-1. Abre el **Administrador de tareas** (`Ctrl + Shift + Esc`).
-2. Ve a la pestaña **Rendimiento** > **CPU**.
-3. En la esquina inferior derecha, comprueba que **Virtualización:** indique **Habilitado**.
-   - *(Si está deshabilitado, deberás activarlo en la BIOS de tu placa base: opción Intel VT-x o AMD-V).*
+
 
 ### 1.2 Instalar WSL 2 (Subsistema de Windows para Linux)
 Docker Desktop funciona de manera óptima en Windows utilizando el motor de WSL 2:
