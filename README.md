@@ -6,31 +6,35 @@ Este modelo representa la arquitectura formal y física de un vehículo eléctri
 
 ## 1. Estructura de Archivos Modulares
 
-El sistema se encuentra dividido en **7 archivos desacoplados** donde cada subsistema posee su propio espacio de nombres (`package`) y se comunica mediante directivas de importación (`private import`):
+El sistema se encuentra dividido en **9 archivos desacoplados** dentro de `Modelos/`, donde cada subsistema o aspecto posee su propio espacio de nombres (`package`) y se comunica mediante directivas de importación (`private import`):
 
 ```text
-models/
+Modelos/
 ├── 00_tipos_base.sysml     <- Magnitudes físicas y definiciones de puertos comunes
 ├── 01_chasis.sysml         <- Subsistema Chasis (bastidor y anclajes)
-├── 02_bateria.sysml        <- Subsistema Batería (potencia eléctrica DC)
+├── 02_bateria.sysml        <- Subsistema Batería (potencia eléctrica DC y requisito de masa)
 ├── 03_powertrain.sysml     <- Subsistema Tren Motriz (potencia a tracción)
 ├── 04_direccion.sysml      <- Subsistema Dirección (cinemática de dirección)
 ├── 05_rueda.sysml          <- Subsistema Rueda (buje, dirección y par)
-├── 06_triciclo.sysml       <- Ensamblado principal, topología de conexiones y balance de masa
-└── electric_tricycle.sysml <- Modelo monolítico original (conservado como referencia)
+├── 06_triciclo.sysml       <- Ensamblado principal, conexiones, balance de masa y requisitos
+├── 07_vistas.sysml         <- Definición de las 4 vistas gráficas para Spec42
+└── 08_comportamiento.sysml <- Máquina de estados mínima de los modos operativos
 ```
 
 ### Tabla de Subsistemas y Paquetes
 
 | Archivo | Paquete SysML v2 | Contenido y Elementos Clave | Dependencias |
 | :--- | :--- | :--- | :--- |
-| [`00_tipos_base.sysml`](00_tipos_base.sysml) | `TiposBase` | `attribute def Mass :> Real`, `port def MechanicalPort`, `port def ElectricalPort` | `ScalarValues::*` |
-| [`01_chasis.sysml`](01_chasis.sysml) | `SubsistemaChasis` | `part def Chassis` con masa y 6 puertos de anclaje mecánico | `TiposBase::*` |
-| [`02_bateria.sysml`](02_bateria.sysml) | `SubsistemaBateria` | `part def BatterySystem` con masa, puerto mecánico y salida eléctrica `powerOut` | `TiposBase::*` |
-| [`03_powertrain.sysml`](03_powertrain.sysml) | `SubsistemaPowertrain` | `part def Powertrain` con entrada eléctrica `powerIn` y salida mecánica de par `driveOut` | `TiposBase::*` |
-| [`04_direccion.sysml`](04_direccion.sysml) | `SubsistemaDireccion` | `part def SteeringSystem` con bieletas de dirección `leftTieRod` y `rightTieRod` | `TiposBase::*` |
-| [`05_rueda.sysml`](05_rueda.sysml) | `SubsistemaRueda` | `part def Wheel` con puerto de buje `hubMount`, entrada de par `driveInput` y dirección `steerInput` | `TiposBase::*` |
-| [`06_triciclo.sysml`](06_triciclo.sysml) | `SistemaTriciclo` | `part def ElectricTricycle`: Ensamblado de las 7 partes, conexiones `connect`, restricción de masa e instancia `part triciclo` | Todos los anteriores |
+| [`Modelos/00_tipos_base.sysml`](Modelos/00_tipos_base.sysml) | `TiposBase` | `attribute def Mass :> Real`, `port def MechanicalPort`, `port def ElectricalPort` | `ScalarValues::*` |
+| [`Modelos/01_chasis.sysml`](Modelos/01_chasis.sysml) | `SubsistemaChasis` | `part def Chassis` con masa y 6 puertos de anclaje mecánico | `TiposBase::*` |
+| [`Modelos/02_bateria.sysml`](Modelos/02_bateria.sysml) | `SubsistemaBateria` | `part def BatterySystem` y requisito `ReqMasaBateria` | `TiposBase::*` |
+| [`Modelos/03_powertrain.sysml`](Modelos/03_powertrain.sysml) | `SubsistemaPowertrain` | `part def Powertrain` con entrada eléctrica `powerIn` y salida mecánica de par `driveOut` | `TiposBase::*` |
+| [`Modelos/04_direccion.sysml`](Modelos/04_direccion.sysml) | `SubsistemaDireccion` | `part def SteeringSystem` con bieletas de dirección `leftTieRod` y `rightTieRod` | `TiposBase::*` |
+| [`Modelos/05_rueda.sysml`](Modelos/05_rueda.sysml) | `SubsistemaRueda` | `part def Wheel` con puerto de buje `hubMount`, entrada de par `driveInput` y dirección `steerInput` | `TiposBase::*` |
+| [`Modelos/06_triciclo.sysml`](Modelos/06_triciclo.sysml) | `SistemaTriciclo` | `part def ElectricTricycle`, `part triciclo`, `ReqMasaMaximaTriciclo` y relaciones `satisfy` | Subsistemas `00` a `05` |
+| [`Modelos/07_vistas.sysml`](Modelos/07_vistas.sysml) | `VistasTriciclo` | `vistaEstructura`, `vistaConexiones`, `vistaRequisitos` (automática) y `vistaModosOperacion` | `StandardViewDefinitions::*`, paquetes del modelo |
+| [`Modelos/08_comportamiento.sysml`](Modelos/08_comportamiento.sysml) | `ComportamientoTriciclo` | `state def ModosTricicloStateMachine` (`Apagado`, `Listo`, `Conduciendo`) | Ninguna |
+
 
 ---
 
@@ -133,3 +137,26 @@ A diferencia de lenguajes tradicionales que usan rutas relativas en disco (`#inc
      private import SubsistemaRueda::*;
      ```
 3. **Encapsulación**: Al usar `private import`, los símbolos importados no se propagan fuera del paquete, evitando colisiones de nombres y manteniendo un diseño limpio y robusto.
+
+---
+
+## 5. Vistas Gráficas en VS Code con Spec42 (`07_vistas.sysml` y `08_comportamiento.sysml`)
+
+El archivo [`Modelos/07_vistas.sysml`](Modelos/07_vistas.sysml) define **4 vistas gráficas** basadas en la librería estándar `StandardViewDefinitions::*` que puedes abrir en VS Code ejecutando el comando **`Spec42: Open Diagram`**:
+
+1. **`vistaEstructura` (`GeneralView` con filtro estructural):**
+   * Muestra la descomposición de bloques del triciclo (`ElectricTricycle`).
+   * Incluye `filter @SysML::PartUsage or @SysML::PartDefinition or @SysML::PortUsage or @SysML::PortDefinition;` para que los requisitos o estados no se mezclen con los bloques físicos.
+2. **`vistaConexiones` (`InterconnectionView`):**
+   * Muestra el cableado eléctrico y los acoplamientos mecánicos internos entre el chasis, batería, tren motriz, dirección y ruedas.
+3. **`vistaRequisitos` (`GeneralView` con recopilación automática):**
+   * Utiliza comodines (`expose SubsistemaBateria::*;`, `expose SistemaTriciclo::*;`, etc.) combinados con:
+     ```sysml
+     filter @SysML::RequirementDefinition
+         or @SysML::RequirementUsage
+         or @SysML::SatisfyRequirementUsage;
+     ```
+   * **¿Por qué es útil?** Cualquier `requirement def` nuevo que añadas dentro de los archivos de subsistema existentes aparecerá automáticamente en esta gráfica sin tener que escribir su nombre en [`Modelos/07_vistas.sysml`](Modelos/07_vistas.sysml).
+4. **`vistaModosOperacion` (`StateTransitionView`):**
+   * Proyecta la máquina de estados `ModosTricicloStateMachine` definida en [`Modelos/08_comportamiento.sysml`](Modelos/08_comportamiento.sysml), mostrando los 3 modos operativos (`apagado`, `listo`, `conduciendo`) y las transiciones disparadas por los eventos `Encender`, `IniciarMarcha`, `Detener` y `Apagar`.
+

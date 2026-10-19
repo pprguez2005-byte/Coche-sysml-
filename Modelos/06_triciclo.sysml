@@ -43,4 +43,15 @@ package SistemaTriciclo {
 
     // Instancia de uso
     part triciclo : ElectricTricycle;
+
+    // Requisito a nivel de sistema completo
+    requirement def ReqMasaMaximaTriciclo {
+        subject vehiculo : ElectricTricycle;
+        doc /* La masa total del triciclo ensamblado no debe superar los 80 kg. */
+        require constraint { vehiculo.totalMass <= 80.0 }
+    }
+
+    // Relaciones 'satisfy': vinculan los requisitos formales con las partes que los cumplen
+    satisfy requirement : ReqMasaMaximaTriciclo by triciclo;
+    satisfy requirement : ReqMasaBateria by triciclo.battery;
 }

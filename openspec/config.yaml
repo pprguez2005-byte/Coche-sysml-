@@ -1,32 +1,28 @@
 schema: spec-driven
 
-# Project context (optional)
-# Add only constraints that should guide OpenSpec artifacts and workflows.
-# Include constraints an agent cannot infer by reading the code.
-# Keep general project documentation and discoverable codebase facts out.
-# Example:
-#   context: |
-#     Designs and tasks must cover Windows, macOS, and Linux
-#     Write all artifacts in Spanish
+context: |
+  Propósito del proyecto: Prueba de concepto (PoC) formativa para que el equipo aprenda simultáneamente:
+  1. El lenguaje de modelado de sistemas SysML v2 (modo texto).
+  2. El flujo de trabajo colaborativo con Git.
+  3. El desarrollo guiado por especificaciones con OpenSpec asistido por IA.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always state what is out of scope
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+  Límites y condiciones del proyecto:
+  - El sistema modelado es un vehículo eléctrico ligero muy sencillo (triciclo Tadpole) al que se añade complejidad de forma gradual.
+  - El objetivo final es APRENDER las herramientas y asentar un procedimiento de trabajo en equipo, NO diseñar un vehículo ni un robot sofisticado de producción.
+  - Alcance acotado: añadir como máximo 2 o 3 componentes o elementos nuevos de prueba por iteración y pocas especificaciones, claras y didácticas.
+  - Enfoque pedagógico: todos los integrantes son nuevos en estas herramientas; todas las propuestas, diseños, tareas y modificaciones deben ser muy incrementales y estar muy bien explicadas paso a paso.
+  - Herramientas núcleo: Visual Studio Code en modo texto con archivos .sysml segmentados modularmente en la carpeta Modelos/, controlados con Git, y visualizados principalmente con la extensión Spec42 (SysML v2).
+  - Aunque puntualmente se prueben herramientas externas (Eclipse SysON, CATIA Magic), la fuente de verdad (núcleo) son siempre los archivos de texto .sysml en Git.
+  - Idioma: redactar todos los artefactos y explicaciones en español.
 
-# Per-operation guidance (optional)
-# Add advisory guidance for how apply and archive work should be conducted.
-# This is separate from artifact rules above.
-# Example:
-#   operations:
-#     apply:
-#       guidance:
-#         - Keep test summaries concise
-#     archive:
-#       guidance:
-#         - Summarize the archive outcome before finishing
+rules:
+  proposal:
+    - Redactar en español con tono didáctico y claro para usuarios que están aprendiendo SysML v2, Git y OpenSpec.
+    - Explicitar siempre los límites del alcance para evitar sobre-ingeniería.
+  specs:
+    - Limitar cada especificación a pocos requisitos (2 a 4 máximo), claros y verificables en Spec42.
+  design:
+    - Explicar el porqué sintáctico de cada construcción SysML v2 propuesta.
+  tasks:
+    - Dividir las tareas en pasos pequeños, incrementales y fáciles de seguir y revisar en Git.
+
