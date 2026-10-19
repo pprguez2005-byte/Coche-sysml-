@@ -14,4 +14,11 @@ package SubsistemaChasis {
         port batteryMount : MechanicalPort;
         port powertrainMount : MechanicalPort;
     }
+    requirement def ReqMasaChasis {
+        // 'subject' indica a qué tipo de bloque se aplica este requisito
+        subject chasis : Chassis;
+        doc /* La masa del chasis no debe superar los 200 kg para facilitar el montaje. */
+        // 'require constraint' formaliza la condición que debe cumplirse
+        require constraint { chasis.mass <= 15.0 }
+    }
 }
