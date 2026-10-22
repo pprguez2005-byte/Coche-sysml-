@@ -1,0 +1,41 @@
+name: Actualizar Historial de Contexto Común
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'openspec/config.yaml'
+
+permissions:
+  contents: write
+
+jobs:
+  actualizar-historial:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Regenerar historial de contexto común
+        run: |
+          python3 .github/scripts/update_context_history.py
+
+      - name: Confirmar y subir cambios si hubo actualizaciones
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain openspec/HISTORIAL_CONTEXTO.md)" ]; then
+            git add openspec/HISTORIAL_CONTEXTO.md
+            git commit -m "docs: auto-actualizar HISTORIAL_CONTEXTO.md [skip ci]"
+            git push
+          else
+            echo "Sin cambios en openspec/HISTORIAL_CONTEXTO.md."
+          fi

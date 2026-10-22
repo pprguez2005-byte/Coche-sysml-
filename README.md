@@ -183,5 +183,6 @@ Este repositorio sigue la metodología **Spec-Driven Development** mediante **Op
    * Una vez revisada la propuesta, se aplican las tareas (`/opsx-apply`) sobre los archivos `.sysml` de `Modelos/` y se verifica que `spec42` no arroje errores.
    * Al finalizar, se archiva la propuesta (`/opsx-archive`), integrando los nuevos requisitos en la especificación maestra `openspec/specs/`, y se sube la rama para hacer Merge / Pull Request hacia `main`.
 5. **Reglas para Asistentes de IA**: Las directrices que obligan a los agentes de IA a respetar este flujo desde el primer mensaje están definidas en [`AGENTS.md`](AGENTS.md) y [`openspec/config.yaml`](openspec/config.yaml).
+6. **Historial de Evolución del Contexto Común**: En [`openspec/HISTORIAL_CONTEXTO.md`](openspec/HISTORIAL_CONTEXTO.md) se registra automáticamente cómo ha ido creciendo el contexto compartido y las reglas acordadas en la rama `main`.
 
 
