@@ -43,4 +43,10 @@ package VistasTriciclo {
         doc /* Muestra los 3 estados operativos del triciclo y sus transiciones */
         expose ComportamientoTriciclo::ModosTricicloStateMachine;
     }
+
+    // Vista 5: Máquina de estados del subsistema de batería (equivalente a STM)
+    view vistaEstadosBateria : StateTransitionView {
+        doc /* Muestra los 3 estados operativos de la batería (desconectada, cargando, descargando) y sus transiciones */
+        expose SubsistemaBateria::EstadosBateriaStateMachine;
+    }
 }
