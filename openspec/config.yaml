@@ -14,6 +14,7 @@ context: |
   - Herramientas núcleo: Visual Studio Code en modo texto con archivos .sysml segmentados modularmente en la carpeta Modelos/, controlados con Git, y visualizados principalmente con la extensión Spec42 (SysML v2).
   - Aunque puntualmente se prueben herramientas externas (Eclipse SysON, CATIA Magic), la fuente de verdad (núcleo) son siempre los archivos de texto .sysml en Git.
   - Idioma: redactar todos los artefactos y explicaciones en español.
+  - Las temperaturas se miden siempre en grados centigrados (Celsius): los atributos y constraints de tipo Temperature estan en C.
 
 rules:
   proposal:

@@ -3,6 +3,9 @@ package TiposBase {
     private import ScalarValues::*;
 
     attribute def Mass :> Real;
+    attribute def Temperature :> Real {
+        doc /* Temperatura expresada siempre en grados centigrados (Celsius) */
+    }
     
     port def MechanicalPort;
     port def ElectricalPort;
