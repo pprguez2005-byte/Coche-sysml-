@@ -29,4 +29,8 @@ package SubsistemaDireccion {
     requirement def GeometriaAckermann {
         doc /* La direccion debe seguir la geometria Ackermann para evitar que las ruedas delanteras derrapen al girar. */
     }
+
+    requirement def AnguloMaximoGiro {
+        doc /* El angulo maximo de giro de las ruedas directrices no debe superar los 35.0 grados para evitar colisiones mecanicas con el chasis y mantener la estabilidad lateral del triciclo. */
+    }
 }
