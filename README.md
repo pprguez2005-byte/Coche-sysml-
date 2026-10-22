@@ -12,12 +12,12 @@ El sistema se encuentra dividido en **9 archivos desacoplados** dentro de `Model
 Modelos/
 ├── 00_tipos_base.sysml     <- Magnitudes físicas y definiciones de puertos comunes
 ├── 01_chasis.sysml         <- Subsistema Chasis (bastidor y anclajes)
-├── 02_bateria.sysml        <- Subsistema Batería (potencia eléctrica DC y requisito de masa)
-├── 03_powertrain.sysml     <- Subsistema Tren Motriz (potencia a tracción)
+├── 02_bateria.sysml        <- Subsistema Batería (potencia eléctrica DC, requisito de masa y estados)
+├── 03_powertrain.sysml     <- Subsistema Tren Motriz (motor, inversor, refrigeración y requisitos)
 ├── 04_direccion.sysml      <- Subsistema Dirección (cinemática de dirección)
 ├── 05_rueda.sysml          <- Subsistema Rueda (buje, dirección y par)
 ├── 06_triciclo.sysml       <- Ensamblado principal, conexiones, balance de masa y requisitos
-├── 07_vistas.sysml         <- Definición de las 4 vistas gráficas para Spec42
+├── 07_vistas.sysml         <- Definición de las 5 vistas gráficas para Spec42
 └── 08_comportamiento.sysml <- Máquina de estados mínima de los modos operativos
 ```
 
@@ -25,14 +25,14 @@ Modelos/
 
 | Archivo | Paquete SysML v2 | Contenido y Elementos Clave | Dependencias |
 | :--- | :--- | :--- | :--- |
-| [`Modelos/00_tipos_base.sysml`](Modelos/00_tipos_base.sysml) | `TiposBase` | `attribute def Mass :> Real`, `port def MechanicalPort`, `port def ElectricalPort` | `ScalarValues::*` |
+| [`Modelos/00_tipos_base.sysml`](Modelos/00_tipos_base.sysml) | `TiposBase` | `attribute def Mass :> Real`, `attribute def Temperature :> Real`, `port def MechanicalPort`, `port def ElectricalPort` | `ScalarValues::*` |
 | [`Modelos/01_chasis.sysml`](Modelos/01_chasis.sysml) | `SubsistemaChasis` | `part def Chassis` con masa y 6 puertos de anclaje mecánico | `TiposBase::*` |
-| [`Modelos/02_bateria.sysml`](Modelos/02_bateria.sysml) | `SubsistemaBateria` | `part def BatterySystem` y requisito `ReqMasaBateria` | `TiposBase::*` |
-| [`Modelos/03_powertrain.sysml`](Modelos/03_powertrain.sysml) | `SubsistemaPowertrain` | `part def Powertrain` con entrada eléctrica `powerIn` y salida mecánica de par `driveOut` | `TiposBase::*` |
+| [`Modelos/02_bateria.sysml`](Modelos/02_bateria.sysml) | `SubsistemaBateria` | `part def BatterySystem`, requisito `ReqMasaBateria` y máquina de estados `EstadosBateriaStateMachine` (`desconectada`, `cargando`, `descargando`) | `TiposBase::*` |
+| [`Modelos/03_powertrain.sysml`](Modelos/03_powertrain.sysml) | `SubsistemaPowertrain` | `part def Powertrain` (motor, inversor, refrigeración, acciones y requisitos de potencia/temperatura) | `TiposBase::*` |
 | [`Modelos/04_direccion.sysml`](Modelos/04_direccion.sysml) | `SubsistemaDireccion` | `part def SteeringSystem` con bieletas de dirección `leftTieRod` y `rightTieRod` | `TiposBase::*` |
 | [`Modelos/05_rueda.sysml`](Modelos/05_rueda.sysml) | `SubsistemaRueda` | `part def Wheel` con puerto de buje `hubMount`, entrada de par `driveInput` y dirección `steerInput` | `TiposBase::*` |
 | [`Modelos/06_triciclo.sysml`](Modelos/06_triciclo.sysml) | `SistemaTriciclo` | `part def ElectricTricycle`, `part triciclo`, `ReqMasaMaximaTriciclo` y relaciones `satisfy` | Subsistemas `00` a `05` |
-| [`Modelos/07_vistas.sysml`](Modelos/07_vistas.sysml) | `VistasTriciclo` | `vistaEstructura`, `vistaConexiones`, `vistaRequisitos` (automática) y `vistaModosOperacion` | `StandardViewDefinitions::*`, paquetes del modelo |
+| [`Modelos/07_vistas.sysml`](Modelos/07_vistas.sysml) | `VistasTriciclo` | `vistaEstructura`, `vistaConexiones`, `vistaRequisitos` (automática), `vistaModosOperacion` y `vistaEstadosBateria` | `StandardViewDefinitions::*`, paquetes del modelo |
 | [`Modelos/08_comportamiento.sysml`](Modelos/08_comportamiento.sysml) | `ComportamientoTriciclo` | `state def ModosTricicloStateMachine` (`Apagado`, `Listo`, `Conduciendo`) | Ninguna |
 
 
@@ -140,9 +140,9 @@ A diferencia de lenguajes tradicionales que usan rutas relativas en disco (`#inc
 
 ---
 
-## 5. Vistas Gráficas en VS Code con Spec42 (`07_vistas.sysml` y `08_comportamiento.sysml`)
+## 5. Vistas Gráficas en VS Code con Spec42 (`07_vistas.sysml`, `08_comportamiento.sysml` y `02_bateria.sysml`)
 
-El archivo [`Modelos/07_vistas.sysml`](Modelos/07_vistas.sysml) define **4 vistas gráficas** basadas en la librería estándar `StandardViewDefinitions::*` que puedes abrir en VS Code ejecutando el comando **`Spec42: Open Diagram`**:
+El archivo [`Modelos/07_vistas.sysml`](Modelos/07_vistas.sysml) define **5 vistas gráficas** basadas en la librería estándar `StandardViewDefinitions::*` que puedes abrir en VS Code ejecutando el comando **`Spec42: Open Diagram`**:
 
 1. **`vistaEstructura` (`GeneralView` con filtro estructural):**
    * Muestra la descomposición de bloques del triciclo (`ElectricTricycle`).
@@ -159,4 +159,29 @@ El archivo [`Modelos/07_vistas.sysml`](Modelos/07_vistas.sysml) define **4 vista
    * **¿Por qué es útil?** Cualquier `requirement def` nuevo que añadas dentro de los archivos de subsistema existentes aparecerá automáticamente en esta gráfica sin tener que escribir su nombre en [`Modelos/07_vistas.sysml`](Modelos/07_vistas.sysml).
 4. **`vistaModosOperacion` (`StateTransitionView`):**
    * Proyecta la máquina de estados `ModosTricicloStateMachine` definida en [`Modelos/08_comportamiento.sysml`](Modelos/08_comportamiento.sysml), mostrando los 3 modos operativos (`apagado`, `listo`, `conduciendo`) y las transiciones disparadas por los eventos `Encender`, `IniciarMarcha`, `Detener` y `Apagar`.
+5. **`vistaEstadosBateria` (`StateTransitionView`):**
+   * Proyecta la máquina de estados `EstadosBateriaStateMachine` definida en [`Modelos/02_bateria.sysml`](Modelos/02_bateria.sysml), mostrando los 3 estados del subsistema de batería (`desconectada`, `cargando`, `descargando`) y las transiciones disparadas por `ConectarCargador`, `DemandarEnergia` y `DesconectarBateria`.
+
+---
+
+## 6. Metodología de Colaboración con Git y OpenSpec
+
+Este repositorio sigue la metodología **Spec-Driven Development** mediante **OpenSpec** y ramas de **Git** para coordinar el trabajo en equipo y asegurar la integridad del modelo SysML v2:
+
+1. **Regla de Oro**: No modificar directamente los archivos de `Modelos/` en la rama `main` ni sin propuesta previa en OpenSpec.
+2. **Paso 0 — Crear una rama en Git**:
+   * Antes de iniciar cualquier cambio, crea una rama dedicada desde `main` actualizada:
+     ```bash
+     git checkout main && git pull origin main
+     git checkout -b <nombre-de-tu-rama>
+     ```
+3. **Ciclo de Propuesta de Cambios (OpenSpec)**:
+   * Antes de implementar un nuevo subsistema (ej. frenos, sensores) o modificar los existentes, se debe formalizar una propuesta:
+     * **Con asistente de IA (Antigravity, Cursor, Claude Code, Copilot, etc.)**: Ejecuta `/opsx-propose <nombre-del-cambio>` en el chat o solicita al asistente iniciar una propuesta con OpenSpec.
+     * **Sin asistente**: Revisa los requisitos maestros en `openspec/specs/` y crea la propuesta estructurada en `openspec/changes/<nombre-del-cambio>/` (o mediante `openspec new change <nombre-del-cambio>`).
+4. **Implementación, Validación y Consolidación**:
+   * Una vez revisada la propuesta, se aplican las tareas (`/opsx-apply`) sobre los archivos `.sysml` de `Modelos/` y se verifica que `spec42` no arroje errores.
+   * Al finalizar, se archiva la propuesta (`/opsx-archive`), integrando los nuevos requisitos en la especificación maestra `openspec/specs/`, y se sube la rama para hacer Merge / Pull Request hacia `main`.
+5. **Reglas para Asistentes de IA**: Las directrices que obligan a los agentes de IA a respetar este flujo desde el primer mensaje están definidas en [`AGENTS.md`](AGENTS.md) y [`openspec/config.yaml`](openspec/config.yaml).
+
 

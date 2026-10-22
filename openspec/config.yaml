@@ -1,10 +1,19 @@
 schema: spec-driven
 
+# Contexto global del proyecto y directrices de ingeniería
 context: |
   Propósito del proyecto: Prueba de concepto (PoC) formativa para que el equipo aprenda simultáneamente:
   1. El lenguaje de modelado de sistemas SysML v2 (modo texto).
   2. El flujo de trabajo colaborativo con Git.
   3. El desarrollo guiado por especificaciones con OpenSpec asistido por IA.
+
+  REGLAS OBLIGATORIAS DE TRABAJO (GIT + OPENSPEC):
+  - Todo cambio, nuevo subsistema o modificación en 'Modelos/' debe realizarse exclusivamente en una rama dedicada y siguiendo el flujo de OpenSpec:
+    0. Rama Git: Crear o situarse en una rama de trabajo (`git checkout -b <nombre-rama>`) antes de iniciar el cambio; nunca trabajar directamente sobre 'main'.
+    1. opsx-propose: Crear la propuesta con proposal.md, specs/, design.md y tasks.md.
+    2. opsx-apply: Implementar las tareas aprobadas en los archivos .sysml.
+    3. opsx-archive: Consolidar las especificaciones en openspec/specs/ y archivar el cambio antes o después de integrar la rama.
+  - Ningún colaborador ni asistente de IA debe editar directamente archivos en 'Modelos/' sin una propuesta aprobada en 'openspec/changes/'.
 
   Límites y condiciones del proyecto:
   - El sistema modelado es un vehículo eléctrico ligero muy sencillo (triciclo Tadpole) al que se añade complejidad de forma gradual.
@@ -13,17 +22,19 @@ context: |
   - Enfoque pedagógico: todos los integrantes son nuevos en estas herramientas; todas las propuestas, diseños, tareas y modificaciones deben ser muy incrementales y estar muy bien explicadas paso a paso.
   - Herramientas núcleo: Visual Studio Code en modo texto con archivos .sysml segmentados modularmente en la carpeta Modelos/, controlados con Git, y visualizados principalmente con la extensión Spec42 (SysML v2).
   - Aunque puntualmente se prueben herramientas externas (Eclipse SysON, CATIA Magic), la fuente de verdad (núcleo) son siempre los archivos de texto .sysml en Git.
-  - Idioma: redactar todos los artefactos y explicaciones en español.
-  - Las temperaturas se miden siempre en grados centigrados (Celsius): los atributos y constraints de tipo Temperature estan en C.
+  - Idioma: redactar todos los artefactos y explicaciones en español técnico.
+  - Las temperaturas se miden siempre en grados centígrados (Celsius): los atributos y constraints de tipo Temperature están en °C.
 
+# Per-artifact rules
 rules:
   proposal:
     - Redactar en español con tono didáctico y claro para usuarios que están aprendiendo SysML v2, Git y OpenSpec.
-    - Explicitar siempre los límites del alcance para evitar sobre-ingeniería.
+    - Explicitar siempre el problema, la necesidad y los límites del alcance para evitar sobre-ingeniería.
+    - Identificar con precisión qué archivos de 'Modelos/' se verán afectados.
   specs:
     - Limitar cada especificación a pocos requisitos (2 a 4 máximo), claros y verificables en Spec42.
   design:
     - Explicar el porqué sintáctico de cada construcción SysML v2 propuesta.
   tasks:
     - Dividir las tareas en pasos pequeños, incrementales y fáciles de seguir y revisar en Git.
-
+    - Incluir siempre una tarea final de validación de sintaxis SysML v2 y diagramas Spec42.
