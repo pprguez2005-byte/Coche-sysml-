@@ -5,7 +5,9 @@ package SubsistemaBateria {
 
     part def BatterySystem {
         attribute mass : Mass;
-        
+        attribute autonomia : Real;                 // Horas de uso continuo con carga completa (h)
+        attribute temperaturaMaxima : Temperature;  // Temperatura maxima de las celdas (grados C)
+
         // Puertos
         port chassisMount : MechanicalPort;
         port powerOut : ElectricalPort;
@@ -18,6 +20,30 @@ package SubsistemaBateria {
         doc /* La masa del sistema de batería no debe superar los 15 kg para facilitar el montaje. */
         // 'require constraint' formaliza la condición que debe cumplirse
         require constraint { bateria.mass <= 15.0 }
+    }
+
+    // Requisitos con restriccion numerica: se pueden comprobar con un valor del 'subject'
+    requirement def ReqAutonomiaBateria {
+        subject bateria : BatterySystem;
+        doc /* La bateria debe ofrecer al menos 2 horas de uso continuo con una carga completa. */
+        require constraint { bateria.autonomia >= 2.0 }
+    }
+
+    requirement def ReqTemperaturaMaximaBateria {
+        subject bateria : BatterySystem;
+        doc /* La temperatura de las celdas no debe superar los 60 C durante el funcionamiento para evitar su degradacion o incendio. */
+        require constraint { bateria.temperaturaMaxima <= 60.0 }
+    }
+
+    // Requisitos textuales: solo 'doc', sin 'require constraint'
+    requirement def ReqProteccionFuegoBateria {
+        subject bateria : BatterySystem;
+        doc /* La carcasa de la bateria debe ser de material ignifugo e impedir que el fuego de una celda se propague al resto de la bateria o al chasis. */
+    }
+
+    requirement def ReqVidaUtilBateria {
+        subject bateria : BatterySystem;
+        doc /* La bateria debe soportar al menos 500 ciclos completos de carga y descarga. */
     }
 
     // 1. Eventos que disparan los cambios de estado de la batería (se modelan como 'item def')
