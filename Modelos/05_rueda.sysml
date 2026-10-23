@@ -22,7 +22,7 @@ package SubsistemaRueda {
         attribute tireWidth : Real = 2.5;     // Ancho del neumatico en pulgadas
 
         attribute vehicleMass : Mass;         // Carga/masa del vehiculo soportada (kg)
-        attribute recommendedPressure : Real; // Presion recomendada en bar
+        attribute recommendedPressure : Pressure; // Presion recomendada en bar
 
         // Calculo de la presion recomendada segun el peso del vehiculo
         assert constraint calculateTirePressure {
@@ -37,7 +37,7 @@ package SubsistemaRueda {
         doc /* Conjunto rueda compuesto por llanta y neumatico */
         attribute mass : Mass;
         attribute vehicleMass : Mass;
-        attribute recommendedPressure : Real;
+        attribute recommendedPressure : Pressure;
 
         // Subpartes que aparecen como bloques hijos en el esquema BDD
         part rim : Rim;
@@ -62,5 +62,21 @@ package SubsistemaRueda {
         // Conexiones internas visibles en el esquema de interconexiones (IBD)
         connect rim.tireSeat to tire.rimMount;
         connect hubMount to rim.hubInterface;
+    }
+
+    // 4. Requisitos del subsistema de rueda
+    requirement def ReqMasaRueda {
+        subject rueda : Wheel;
+        doc /* La masa del conjunto ensamblado de la rueda no debe exceder los 3.5 kg para optimizar el peso total. */
+        require constraint { rueda.mass <= 3.5 }
+    }
+
+    requirement def ReqPresionSegura {
+        subject rueda : Wheel;
+        doc /* La presion calculada de inflado de la rueda debe encontrarse en el rango operativo seguro de 1.8 a 3.5 bar. */
+        require constraint {
+            rueda.recommendedPressure >= 1.8 and
+            rueda.recommendedPressure <= 3.5
+        }
     }
 }

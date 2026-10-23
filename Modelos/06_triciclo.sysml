@@ -54,4 +54,7 @@ package SistemaTriciclo {
     // Relaciones 'satisfy': vinculan los requisitos formales con las partes que los cumplen
     satisfy requirement : ReqMasaMaximaTriciclo by triciclo;
     satisfy requirement : ReqMasaBateria by triciclo.battery;
+    satisfy requirement : ReqMasaRueda by triciclo.frontWheelLeft;
+    satisfy requirement : ReqMasaRueda by triciclo.frontWheelRight;
+    satisfy requirement : ReqMasaRueda by triciclo.rearWheel;
 }

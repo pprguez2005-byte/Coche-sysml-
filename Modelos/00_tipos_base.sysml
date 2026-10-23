@@ -6,6 +6,9 @@ package TiposBase {
     attribute def Temperature :> Real {
         doc /* Temperatura expresada siempre en grados centigrados (Celsius) */
     }
+    attribute def Pressure :> Real {
+        doc /* Presion expresada en bar (manometrica) */
+    }
     
     port def MechanicalPort;
     port def ElectricalPort;
