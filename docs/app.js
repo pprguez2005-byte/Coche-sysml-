@@ -55,118 +55,76 @@ const EQUIPO_CANONICO = [
   }
 ];
 
-// Catálogo estructurado de archivos del proyecto con atribución de autoría
-const ARCHIVOS_REPOSITORIO = [
+// Estructura jerárquica de carpetas del proyecto estilo Apple Finder
+const CARPETAS_PROYECTO = [
   {
-    path: "Modelos/00_tipos_base.sysml",
-    categoria: "Modelos/",
-    descripcion: "Magnitudes físicas, puertos mecánicos y eléctricos base",
-    autorId: "pelayo",
-    tipo: "SysML v2"
+    id: "modelos",
+    nombre: "Modelos",
+    ruta: "Modelos/",
+    descripcion: "Modelos modulares y vistas en lenguaje SysML v2",
+    colorIcono: "bg-purple-100 text-purple-700",
+    archivos: [
+      { nombre: "00_tipos_base.sysml", path: "Modelos/00_tipos_base.sysml", desc: "Tipos base, magnitudes físicas y puertos comunes", autorId: "pelayo", tipo: "SysML v2" },
+      { nombre: "01_chasis.sysml", path: "Modelos/01_chasis.sysml", desc: "Subsistema Chasis (bastidor y 6 puntos de anclaje)", autorId: "pelayo", tipo: "SysML v2" },
+      { nombre: "02_bateria.sysml", path: "Modelos/02_bateria.sysml", desc: "Subsistema Batería, límite de masa y máquina de estados", autorId: "jose", tipo: "SysML v2" },
+      { nombre: "03_powertrain.sysml", path: "Modelos/03_powertrain.sysml", desc: "Tren Motriz, motor eléctrico, inversor y refrigeración", autorId: "pelayo", tipo: "SysML v2" },
+      { nombre: "04_direccion.sysml", path: "Modelos/04_direccion.sysml", desc: "Subsistema Dirección y cinemática de bieletas", autorId: "juan", tipo: "SysML v2" },
+      { nombre: "05_rueda.sysml", path: "Modelos/05_rueda.sysml", desc: "Subsistema Rueda, buje y transmisión de par motriz", autorId: "eloy", tipo: "SysML v2" },
+      { nombre: "06_triciclo.sysml", path: "Modelos/06_triciclo.sysml", desc: "Ensamblado Tadpole y restricción física de balance de masa", autorId: "pelayo", tipo: "SysML v2" },
+      { nombre: "07_vistas.sysml", path: "Modelos/07_vistas.sysml", desc: "Definición de vistas gráficas para Spec42 (estructura y requisitos)", autorId: "cesar", tipo: "SysML v2" },
+      { nombre: "08_comportamiento.sysml", path: "Modelos/08_comportamiento.sysml", desc: "Máquina de estados de modos operativos (Apagado, Listo, Conduciendo)", autorId: "eloy", tipo: "SysML v2" }
+    ]
   },
   {
-    path: "Modelos/01_chasis.sysml",
-    categoria: "Modelos/",
-    descripcion: "Estructura del bastidor y anclajes mecánicos",
-    autorId: "pelayo",
-    tipo: "SysML v2"
+    id: "openspec",
+    nombre: "openspec",
+    ruta: "openspec/",
+    descripcion: "Especificaciones del método y directrices de ingeniería",
+    colorIcono: "bg-blue-100 text-blue-700",
+    archivos: [
+      { nombre: "specs/dashboard-seguimiento/spec.md", path: "openspec/specs/dashboard-seguimiento/spec.md", desc: "Especificación formal del panel de control web y tareas", autorId: "pelayo", tipo: "OpenSpec" },
+      { nombre: "config.yaml", path: "openspec/config.yaml", desc: "Configuración global y reglas obligatorias de trabajo en equipo", autorId: "juan", tipo: "Config" },
+      { nombre: "HISTORIAL_CONTEXTO.md", path: "openspec/HISTORIAL_CONTEXTO.md", desc: "Registro automatizado del crecimiento del contexto compartido", autorId: "cesar", tipo: "Docs" }
+    ]
   },
   {
-    path: "Modelos/02_bateria.sysml",
-    categoria: "Modelos/",
-    descripcion: "Batería DC, requisito de masa y máquina de estados",
-    autorId: "jose",
-    tipo: "SysML v2"
+    id: "docs",
+    nombre: "docs",
+    ruta: "docs/",
+    descripcion: "Código y recursos del portal web en GitHub Pages",
+    colorIcono: "bg-emerald-100 text-emerald-700",
+    archivos: [
+      { nombre: "index.html", path: "docs/index.html", desc: "Estructura principal de la interfaz web Apple", autorId: "pelayo", tipo: "HTML" },
+      { nombre: "styles.css", path: "docs/styles.css", desc: "Estilos visuales y componentes Apple HIG", autorId: "pelayo", tipo: "CSS" },
+      { nombre: "app.js", path: "docs/app.js", desc: "Lógica de GitHub API, explorador de carpetas y tareas", autorId: "pelayo", tipo: "JavaScript" },
+      { nombre: "README.md", path: "docs/README.md", desc: "Instrucciones de apertura y despliegue del panel", autorId: "cesar", tipo: "Markdown" }
+    ]
   },
   {
-    path: "Modelos/03_powertrain.sysml",
-    categoria: "Modelos/",
-    descripcion: "Tren motriz, motor, inversor, refrigeración y potencia",
-    autorId: "pelayo",
-    tipo: "SysML v2"
-  },
-  {
-    path: "Modelos/04_direccion.sysml",
-    categoria: "Modelos/",
-    descripcion: "Cinemática de giro delantera y bieletas de dirección",
-    autorId: "juan",
-    tipo: "SysML v2"
-  },
-  {
-    path: "Modelos/05_rueda.sysml",
-    categoria: "Modelos/",
-    descripcion: "Subsistema rueda, entrada de par y buje",
-    autorId: "eloy",
-    tipo: "SysML v2"
-  },
-  {
-    path: "Modelos/06_triciclo.sysml",
-    categoria: "Modelos/",
-    descripcion: "Ensamblado general Tadpole y restricción de masa total",
-    autorId: "pelayo",
-    tipo: "SysML v2"
-  },
-  {
-    path: "Modelos/07_vistas.sysml",
-    categoria: "Modelos/",
-    descripcion: "Definición de vistas gráficas estructurales y requisitos para Spec42",
-    autorId: "cesar",
-    tipo: "SysML v2"
-  },
-  {
-    path: "Modelos/08_comportamiento.sysml",
-    categoria: "Modelos/",
-    descripcion: "Máquina de estados de los modos operativos de conducción",
-    autorId: "eloy",
-    tipo: "SysML v2"
-  },
-  {
-    path: "openspec/specs/dashboard-seguimiento/spec.md",
-    categoria: "openspec/",
-    descripcion: "Especificación formal del panel de seguimiento y tareas",
-    autorId: "pelayo",
-    tipo: "OpenSpec"
-  },
-  {
-    path: "openspec/config.yaml",
-    categoria: "openspec/",
-    descripcion: "Reglas de desarrollo guiado por especificaciones y convenciones",
-    autorId: "juan",
-    tipo: "Config"
-  },
-  {
-    path: "AGENTS.md",
-    categoria: "openspec/",
-    descripcion: "Directrices obligatorias de flujo Git y OpenSpec para agentes de IA",
-    autorId: "cesar",
-    tipo: "Docs"
-  },
-  {
-    path: "docs/index.html",
-    categoria: "docs/",
-    descripcion: "Interfaz web de seguimiento y control publicada en GitHub Pages",
-    autorId: "pelayo",
-    tipo: "Web"
-  },
-  {
-    path: "README.md",
-    categoria: "docs/",
-    descripcion: "Documentación principal y guía didáctica del proyecto",
-    autorId: "cesar",
-    tipo: "Markdown"
+    id: "raiz",
+    nombre: "Raíz del Proyecto",
+    ruta: "/",
+    descripcion: "Documentación principal y normas para agentes",
+    colorIcono: "bg-slate-200 text-slate-700",
+    archivos: [
+      { nombre: "README.md", path: "README.md", desc: "Memoria técnica del vehículo y arquitectura formal SysML v2", autorId: "cesar", tipo: "Markdown" },
+      { nombre: "AGENTS.md", path: "AGENTS.md", desc: "Instrucciones y restricciones obligatorias para agentes de IA", autorId: "pelayo", tipo: "Docs" },
+      { nombre: "FlujoDeTrabajoConOpenSpec.md", path: "FlujoDeTrabajoConOpenSpec.md", desc: "Guía didáctica del flujo de especificaciones y Git", autorId: "juan", tipo: "Docs" },
+      { nombre: "GuiaInstalacionHerramientas.md", path: "GuiaInstalacionHerramientas.md", desc: "Manual de instalación de VS Code, Spec42 y SysON", autorId: "cesar", tipo: "Docs" }
+    ]
   }
 ];
 
 let estadoApp = {
-  seccionActual: "panel", // panel | archivos | tareas | miembro
+  seccionActual: "panel",
   miembros: [],
   commits: [],
   ramas: [],
   pullRequests: [],
   tareas: [],
-  filtroTareas: "todas", // todas | pendientes | completadas
-  filtroArchivos: "todos", // todos | Modelos/ | openspec/ | docs/
+  filtroTareas: "todas",
   busquedaArchivo: "",
+  carpetasAbiertas: new Set(["modelos", "openspec"]), // Por defecto abiertas
   cargando: true
 };
 
@@ -174,10 +132,10 @@ document.addEventListener("DOMContentLoaded", () => {
   cargarTareasLocalStorage();
   configurarNavegacion();
   inicializarDatos();
-  configurarEventosArchivosYTareas();
+  configurarEventosFinderYTareas();
 });
 
-// Manejo de rutas con Hash para soportar navegación y botón Atrás del navegador
+// Manejo de rutas y Segmented Control
 function configurarNavegacion() {
   window.addEventListener("hashchange", procesarRutaActual);
 
@@ -212,7 +170,6 @@ function configurarNavegacion() {
 function procesarRutaActual() {
   const hash = window.location.hash || "#/panel";
 
-  // Actualizar estados de botones en el Segmented Control
   document.querySelectorAll(".apple-segmented-control button").forEach(b => b.classList.remove("active"));
 
   if (hash.startsWith("#/miembro/")) {
@@ -222,7 +179,7 @@ function procesarRutaActual() {
   } else if (hash === "#/archivos") {
     mostrarSeccion("vista-archivos");
     document.getElementById("nav-btn-archivos").classList.add("active");
-    renderizarArchivos();
+    renderizarArchivosFinder();
   } else if (hash === "#/tareas") {
     mostrarSeccion("vista-tareas");
     document.getElementById("nav-btn-tareas").classList.add("active");
@@ -268,7 +225,7 @@ async function inicializarDatos() {
     renderizarMetricas();
     renderizarGridMiembros();
     renderizarTimelineGlobal();
-    renderizarArchivos();
+    renderizarArchivosFinder();
     renderizarTareas();
 
     procesarRutaActual();
@@ -562,76 +519,145 @@ function mostrarVistaMiembro(idOMiembro) {
 }
 
 // ====================================================================
-// SECCIÓN 3: EXPLORADOR DE ARCHIVOS Y AUTORÍA
+// SECCIÓN 3: EXPLORADOR DE ARCHIVOS POR CARPETAS (FINDER DE APPLE)
 // ====================================================================
-function renderizarArchivos() {
-  const container = document.getElementById("lista-archivos-contenedor");
+function renderizarArchivosFinder() {
+  const container = document.getElementById("contenedor-carpetas-finder");
   if (!container) return;
   container.innerHTML = "";
 
-  const filtrados = ARCHIVOS_REPOSITORIO.filter(item => {
-    // Filtro por categoría
-    if (estadoApp.filtroArchivos !== "todos" && item.categoria !== estadoApp.filtroArchivos) {
-      return false;
+  const query = (estadoApp.busquedaArchivo || "").toLowerCase();
+
+  CARPETAS_PROYECTO.forEach(carpeta => {
+    // Filtrar archivos según búsqueda
+    const archivosFiltrados = carpeta.archivos.filter(item => {
+      if (!query) return true;
+      const autor = EQUIPO_CANONICO.find(m => m.id === item.autorId);
+      return item.nombre.toLowerCase().includes(query) ||
+             item.desc.toLowerCase().includes(query) ||
+             item.path.toLowerCase().includes(query) ||
+             (autor && autor.nombre.toLowerCase().includes(query));
+    });
+
+    // Si hay búsqueda y hay coincidencia, auto-abrir la carpeta
+    if (query && archivosFiltrados.length > 0) {
+      estadoApp.carpetasAbiertas.add(carpeta.id);
     }
-    // Filtro por búsqueda
-    if (estadoApp.busquedaArchivo) {
-      const q = estadoApp.busquedaArchivo.toLowerCase();
-      return item.path.toLowerCase().includes(q) || 
-             item.descripcion.toLowerCase().includes(q) ||
-             (EQUIPO_CANONICO.find(m => m.id === item.autorId)?.nombre.toLowerCase().includes(q));
+
+    // Si hay búsqueda y no hay coincidencias en esta carpeta, omitirla
+    if (query && archivosFiltrados.length === 0) {
+      return;
     }
-    return true;
-  });
 
-  if (filtrados.length === 0) {
-    container.innerHTML = `<div class="p-8 text-center text-xs text-[#86868b]">No se encontraron archivos con ese criterio de búsqueda.</div>`;
-    return;
-  }
+    const estaAbierta = estadoApp.carpetasAbiertas.has(carpeta.id);
 
-  filtrados.forEach(file => {
-    const autor = EQUIPO_CANONICO.find(m => m.id === file.autorId) || EQUIPO_CANONICO[0];
-    const row = document.createElement("div");
-    row.className = "p-4 hover:bg-[#f5f5f7] transition flex flex-col sm:flex-row sm:items-center justify-between gap-3";
+    // Tarjeta contenedora de la carpeta
+    const folderCard = document.createElement("div");
+    folderCard.className = `apple-card overflow-hidden finder-folder ${estaAbierta ? 'open' : ''}`;
 
-    // Icono según tipo
-    const iconoColor = file.tipo === "SysML v2" ? "text-purple-600 bg-purple-50" : (file.tipo === "OpenSpec" ? "text-blue-600 bg-blue-50" : "text-emerald-600 bg-emerald-50");
+    // Cabecera de la carpeta (clicable)
+    const header = document.createElement("div");
+    header.className = "finder-folder-header p-4 sm:p-5 flex items-center justify-between";
+    header.innerHTML = `
+      <div class="flex items-center space-x-3.5 min-w-0">
+        <!-- Chevron animado -->
+        <svg class="finder-chevron w-4 h-4 text-[#86868b] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
+        </svg>
 
-    row.innerHTML = `
-      <div class="flex items-start sm:items-center space-x-3.5 min-w-0">
-        <div class="w-9 h-9 rounded-xl ${iconoColor} flex items-center justify-center font-mono text-xs font-bold shrink-0">
-          ${file.tipo === "SysML v2" ? "v2" : (file.tipo === "OpenSpec" ? "Sp" : "Md")}
+        <!-- Icono de Carpeta macOS -->
+        <div class="w-10 h-10 rounded-xl bg-[#0071e3]/10 text-[#0071e3] flex items-center justify-center font-bold text-lg shrink-0">
+          📁
         </div>
+
         <div class="min-w-0">
           <div class="flex items-center gap-2">
-            <span class="font-mono text-xs font-semibold text-[#1d1d1f] truncate">${file.path}</span>
-            <span class="text-[10px] px-1.5 py-0.2 bg-[#0000000a] text-[#86868b] rounded font-medium">${file.tipo}</span>
+            <h3 class="font-semibold text-base text-[#1d1d1f] font-mono tracking-tight">${carpeta.ruta}</h3>
+            <span class="apple-pill bg-[#0000000a] text-[#86868b] text-[11px] py-0.5 px-2">
+              ${archivosFiltrados.length} ${archivosFiltrados.length === 1 ? 'archivo' : 'archivos'}
+            </span>
           </div>
-          <p class="text-xs text-[#86868b] mt-0.5 truncate">${file.descripcion}</p>
+          <p class="text-xs text-[#86868b] mt-0.5 truncate">${carpeta.descripcion}</p>
         </div>
       </div>
 
-      <div class="flex items-center justify-between sm:justify-end space-x-4 shrink-0 pl-12 sm:pl-0">
-        <!-- Tarjeta de autoría -->
-        <div class="flex items-center space-x-2">
-          <img src="${autor.avatar}" alt="${autor.nombre}" class="w-6 h-6 rounded-full border border-[#00000014] object-cover bg-white">
-          <div class="text-left">
-            <span class="text-xs font-medium text-[#1d1d1f] block leading-tight">${autor.nombre.split(" ")[0]}</span>
-            <span class="text-[10px] text-[#86868b] block">Autor / Editor</span>
-          </div>
-        </div>
-
-        <a href="https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/main/${file.path}" target="_blank" rel="noopener noreferrer" class="text-xs text-[#0071e3] hover:underline font-medium inline-flex items-center gap-1">
-          Ver código
-          <svg class="w-3 h-3 text-[#86868b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-          </svg>
-        </a>
-      </div>
+      <span class="text-xs text-[#0071e3] font-medium hidden sm:inline shrink-0">
+        ${estaAbierta ? 'Ocultar archivos' : 'Mostrar archivos'}
+      </span>
     `;
 
-    container.appendChild(row);
+    // Evento para abrir/cerrar carpeta
+    header.addEventListener("click", () => {
+      if (estadoApp.carpetasAbiertas.has(carpeta.id)) {
+        estadoApp.carpetasAbiertas.delete(carpeta.id);
+      } else {
+        estadoApp.carpetasAbiertas.add(carpeta.id);
+      }
+      renderizarArchivosFinder();
+    });
+
+    folderCard.appendChild(header);
+
+    // Contenedor de archivos interiores
+    const filesContainer = document.createElement("div");
+    filesContainer.className = "finder-files-container border-t border-[#0000000d] bg-[#fafafc] divide-y divide-[#00000008]";
+
+    archivosFiltrados.forEach(file => {
+      const autor = EQUIPO_CANONICO.find(m => m.id === file.autorId) || EQUIPO_CANONICO[0];
+      const row = document.createElement("div");
+      row.className = "p-3.5 sm:px-6 hover:bg-white transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 pl-8 sm:pl-16";
+
+      const tipoBadge = file.tipo === "SysML v2" 
+        ? "bg-purple-100 text-purple-700 font-semibold" 
+        : (file.tipo === "OpenSpec" ? "bg-blue-100 text-blue-700 font-semibold" : "bg-slate-200 text-slate-700");
+
+      row.innerHTML = `
+        <div class="flex items-start sm:items-center space-x-3 min-w-0">
+          <!-- Icono de documento -->
+          <div class="w-7 h-7 rounded-lg bg-white border border-[#00000014] text-[#86868b] flex items-center justify-center font-mono text-[10px] font-bold shrink-0 shadow-2xs">
+            📄
+          </div>
+
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs font-semibold text-[#1d1d1f] truncate">${file.nombre}</span>
+              <span class="text-[10px] px-1.5 py-0.2 rounded ${tipoBadge}">${file.tipo}</span>
+            </div>
+            <p class="text-xs text-[#86868b] mt-0.5 truncate">${file.desc}</p>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between sm:justify-end space-x-4 shrink-0 pl-10 sm:pl-0">
+          <!-- Autoría -->
+          <div class="flex items-center space-x-2 bg-white px-2.5 py-1 rounded-full border border-[#0000000d] shadow-2xs">
+            <img src="${autor.avatar}" alt="${autor.nombre}" class="w-4 h-4 rounded-full object-cover">
+            <span class="text-xs font-medium text-[#1d1d1f]">${autor.nombre.split(" ")[0]}</span>
+            <span class="text-[10px] text-[#86868b]">• ${autor.rol}</span>
+          </div>
+
+          <a href="https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/main/${file.path}" target="_blank" rel="noopener noreferrer" class="text-xs text-[#0071e3] hover:underline font-medium inline-flex items-center gap-1 shrink-0">
+            Ver código
+            <svg class="w-3 h-3 text-[#86868b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+          </a>
+        </div>
+      `;
+
+      filesContainer.appendChild(row);
+    });
+
+    folderCard.appendChild(filesContainer);
+    container.appendChild(folderCard);
   });
+
+  if (container.children.length === 0) {
+    container.innerHTML = `
+      <div class="apple-card p-12 text-center text-xs text-[#86868b]">
+        No se encontraron archivos ni carpetas que coincidan con "<strong>${escapeHtml(estadoApp.busquedaArchivo)}</strong>".
+      </div>
+    `;
+  }
 }
 
 // ====================================================================
@@ -648,7 +674,7 @@ function cargarTareasLocalStorage() {
     }
   }
 
-  // Tareas iniciales por defecto orientadas al proyecto
+  // Tareas didácticas iniciales
   estadoApp.tareas = [
     {
       id: "t1",
@@ -709,7 +735,6 @@ function renderizarTareas() {
     return true;
   });
 
-  // Actualizar conteos en los botones
   const total = estadoApp.tareas.length;
   const pendientes = estadoApp.tareas.filter(t => !t.completada).length;
   const completadas = estadoApp.tareas.filter(t => t.completada).length;
@@ -734,7 +759,6 @@ function renderizarTareas() {
 
     row.innerHTML = `
       <div class="flex items-center space-x-3.5 min-w-0">
-        <!-- Checkbox circular estilo Apple Reminders -->
         <button class="apple-checkbox ${tarea.completada ? 'checked' : ''}" data-id="${tarea.id}">
           <svg fill="none" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
@@ -755,13 +779,11 @@ function renderizarTareas() {
       </div>
 
       <div class="flex items-center space-x-3 shrink-0">
-        <!-- Asignado a -->
         <div class="flex items-center space-x-1.5 bg-[#f5f5f7] px-2.5 py-1 rounded-full border border-[#0000000d]">
           <img src="${miembro.avatar}" alt="${miembro.nombre}" class="w-4 h-4 rounded-full object-cover">
           <span class="text-xs font-medium text-[#1d1d1f]">${miembro.nombre.split(" ")[0]}</span>
         </div>
 
-        <!-- Botón eliminar tarea -->
         <button class="btn-eliminar-tarea text-[#86868b] hover:text-red-500 p-1 opacity-40 group-hover:opacity-100 transition" data-id="${tarea.id}" title="Eliminar tarea">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -770,14 +792,12 @@ function renderizarTareas() {
       </div>
     `;
 
-    // Evento de checkbox
     row.querySelector(".apple-checkbox").addEventListener("click", () => {
       tarea.completada = !tarea.completada;
       guardarTareasLocalStorage();
       renderizarTareas();
     });
 
-    // Evento de eliminar
     row.querySelector(".btn-eliminar-tarea").addEventListener("click", () => {
       estadoApp.tareas = estadoApp.tareas.filter(t => t.id !== tarea.id);
       guardarTareasLocalStorage();
@@ -788,35 +808,30 @@ function renderizarTareas() {
   });
 }
 
-function configurarEventosArchivosYTareas() {
-  // Filtros de categoría de archivos
-  const botonesArchivos = [
-    { id: "filtro-arch-todos", valor: "todos" },
-    { id: "filtro-arch-modelos", valor: "Modelos/" },
-    { id: "filtro-arch-openspec", valor: "openspec/" },
-    { id: "filtro-arch-docs", valor: "docs/" }
-  ];
-
-  botonesArchivos.forEach(item => {
-    const btn = document.getElementById(item.id);
-    if (!btn) return;
-    btn.addEventListener("click", () => {
-      botonesArchivos.forEach(b => {
-        const el = document.getElementById(b.id);
-        el.className = "px-3 py-1 rounded-lg text-[#86868b] hover:text-[#1d1d1f] transition";
-      });
-      btn.className = "px-3 py-1 rounded-lg bg-white shadow-sm font-semibold text-[#1d1d1f] transition";
-      estadoApp.filtroArchivos = item.valor;
-      renderizarArchivos();
+function configurarEventosFinderYTareas() {
+  // Botones de Expandir y Colapsar todo
+  const btnExpandir = document.getElementById("btn-expandir-carpetas");
+  if (btnExpandir) {
+    btnExpandir.addEventListener("click", () => {
+      CARPETAS_PROYECTO.forEach(c => estadoApp.carpetasAbiertas.add(c.id));
+      renderizarArchivosFinder();
     });
-  });
+  }
 
-  // Buscador de archivos
+  const btnColapsar = document.getElementById("btn-colapsar-carpetas");
+  if (btnColapsar) {
+    btnColapsar.addEventListener("click", () => {
+      estadoApp.carpetasAbiertas.clear();
+      renderizarArchivosFinder();
+    });
+  }
+
+  // Buscador predictivo en el explorador
   const inputBusqueda = document.getElementById("busqueda-archivos");
   if (inputBusqueda) {
     inputBusqueda.addEventListener("input", (e) => {
       estadoApp.busquedaArchivo = e.target.value.trim();
-      renderizarArchivos();
+      renderizarArchivosFinder();
     });
   }
 
@@ -897,7 +912,7 @@ function usarDatosLocales() {
   renderizarMetricas();
   renderizarGridMiembros();
   renderizarTimelineGlobal();
-  renderizarArchivos();
+  renderizarArchivosFinder();
   renderizarTareas();
   procesarRutaActual();
 }

@@ -34,11 +34,15 @@ El repositorio SHALL incluir en su raíz el archivo `index.html` y el marcador `
 - **THEN** el sistema carga directamente la interfaz interactiva del panel de control en lugar de procesar y mostrar el documento README
 
 ### Requirement: Explorador visual de archivos y autoría
-El sistema SHALL proporcionar una vista de explorador que liste los archivos clave del repositorio (incluyendo modelos SysML v2 y especificaciones), identificando el miembro del equipo responsable de la última modificación, la fecha relativa del cambio y el enlace directo al archivo en GitHub.
+El sistema SHALL proporcionar un explorador jerárquico por carpetas (estilo Finder / explorador de escritorio) donde el usuario pueda abrir o colapsar carpetas del proyecto (`Modelos/`, `openspec/`, `docs/`, raíz), inspeccionar los archivos dentro de cada una e identificar el miembro del equipo responsable de su modificación con enlace directo al repositorio.
 
 #### Scenario: Visualización del listado de archivos del repositorio
 - **WHEN** el usuario selecciona la pestaña de Archivos en la navegación
 - **THEN** el sistema presenta el árbol o lista de archivos del proyecto mostrando la ruta, autor atribuido y última fecha de edición
+
+#### Scenario: Visualización y apertura de carpetas en el explorador
+- **WHEN** el usuario pulsa sobre una carpeta en el explorador
+- **THEN** la carpeta se despliega mostrando sus archivos internos con iconos, nombre, autor atribuido y descripción técnica
 
 ### Requirement: Gestor interactivo de tareas pendientes (To-Do)
 El sistema SHALL permitir crear tareas para la organización del proyecto, asignar cada tarea a uno de los integrantes del equipo, marcar o desmarcar su estado de completitud y almacenar los datos localmente para conservarlos entre sesiones.

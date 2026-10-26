@@ -25,3 +25,8 @@ Antes de realizar cualquier modificación en los modelos del proyecto, **DEBES**
   1. **DETENTE inmediatamente** antes de crear o actualizar propuestas de OpenSpec o editar cualquier archivo.
   2. **Emite un fallo/alerta de bloqueo (`[FALLO DE VALIDACIÓN: MODIFICACIÓN DE REQUISITO]`)** detallando qué requisito se ve afectado, cuál es su condición actual y cuál sería la nueva.
   3. **Solicita confirmación explícita** al usuario para verificar que desea alterar el requisito y que es plenamente consciente del impacto antes de continuar.
+
+## 4. Prohibido hacer merge a `main` o `git push` a `main` sin confirmación previa
+- **NUNCA** hagas el merge de una rama de trabajo hacia `main` ni ejecutes `git push origin main` de manera automática tras haber implementado o archivado un cambio en OpenSpec.
+- Tras completar las tareas y archivar el cambio (`/opsx-archive`) en la rama dedicada, el asistente de IA **DEBE DETENERSE**, presentar el resumen del trabajo completado en la rama y **PREGUNTAR EXPLÍCITAMENTE** al usuario si desea que se realice el merge hacia `main` y la subida de los cambios al repositorio remoto.
+- Solo cuando el usuario confirme afirmativa y expresamente (ej. *"haz el merge"*, *"sube los cambios a main"*), la IA podrá situarse en `main`, integrar la rama y hacer push.

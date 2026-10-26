@@ -15,6 +15,7 @@ context: |
     3. opsx-archive: Consolidar las especificaciones en openspec/specs/ y archivar el cambio antes o después de integrar la rama.
   - Ningún colaborador ni asistente de IA debe editar directamente archivos en 'Modelos/' sin una propuesta aprobada en 'openspec/changes/'.
   - PROTECCIÓN DE REQUISITOS: Si cualquier petición o componente nuevo requiere modificar, rebajar o eliminar un requisito existente (en 'Modelos/*.sysml' o en 'openspec/specs/'), el agente debe detenerse antes de ejecutar, emitir un fallo/aviso explícito e informar al usuario para que confirme que es consciente de que está modificando un requisito.
+  - PROHIBIDO MERGE/PUSH A MAIN SIN CONFIRMACIÓN: Ningún asistente de IA puede realizar el merge a 'main' ni hacer 'git push' a 'main' de forma automática tras completar un cambio en OpenSpec. Tras completar la implementación y archivar el cambio en la rama de trabajo, la IA debe detenerse y solicitar confirmación explícita al usuario antes de integrar la rama o subir cambios a 'main'.
 
   Límites y condiciones del proyecto:
   - El sistema modelado es un vehículo eléctrico ligero muy sencillo (triciclo Tadpole) al que se añade complejidad de forma gradual.

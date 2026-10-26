@@ -201,7 +201,7 @@
     </div>
 
     <!-- ======================================================== -->
-    <!-- SECCIÓN 3: EXPLORADOR DE ARCHIVOS Y AUTORÍA              -->
+    <!-- SECCIÓN 3: EXPLORADOR DE ARCHIVOS (ESTILO APPLE FINDER) -->
     <!-- ======================================================== -->
     <div id="vista-archivos" class="view-container view-hidden">
       
@@ -211,32 +211,34 @@
             Explorador de Archivos
           </h1>
           <p class="text-sm text-[#86868b] mt-1">
-            Estructura modular del repositorio SysML v2 con autoría de cada subsistema.
+            Estructura jerárquica por carpetas (estilo escritorio) con autoría de cada subsistema.
           </p>
         </div>
 
-        <!-- Filtros de categoría -->
-        <div class="flex items-center gap-1.5 bg-[#0000000a] p-1 rounded-xl text-xs font-medium self-start sm:self-auto">
-          <button id="filtro-arch-todos" class="px-3 py-1 rounded-lg bg-white shadow-sm font-semibold text-[#1d1d1f] transition">Todos</button>
-          <button id="filtro-arch-modelos" class="px-3 py-1 rounded-lg text-[#86868b] hover:text-[#1d1d1f] transition">Modelos/</button>
-          <button id="filtro-arch-openspec" class="px-3 py-1 rounded-lg text-[#86868b] hover:text-[#1d1d1f] transition">openspec/</button>
-          <button id="filtro-arch-docs" class="px-3 py-1 rounded-lg text-[#86868b] hover:text-[#1d1d1f] transition">docs/</button>
+        <!-- Botones de control estilo Finder -->
+        <div class="flex items-center gap-2">
+          <button id="btn-expandir-carpetas" class="apple-pill bg-white border border-[#00000014] text-[#1d1d1f] hover:bg-[#f5f5f7] transition shadow-sm text-xs font-medium">
+            Expandir todo
+          </button>
+          <button id="btn-colapsar-carpetas" class="apple-pill bg-white border border-[#00000014] text-[#86868b] hover:text-[#1d1d1f] hover:bg-[#f5f5f7] transition shadow-sm text-xs font-medium">
+            Colapsar todo
+          </button>
         </div>
       </div>
 
-      <!-- Buscador rápido de archivos -->
-      <div class="mb-5">
+      <!-- Buscador tipo Finder -->
+      <div class="mb-6">
         <div class="relative">
-          <input type="text" id="busqueda-archivos" placeholder="Filtrar archivo (ej. bateria, chasis, vistas)..." class="w-full bg-white border border-[#00000014] rounded-xl px-4 py-2.5 pl-10 text-sm text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition shadow-sm">
+          <input type="text" id="busqueda-archivos" placeholder="Buscar archivo o subsistema (ej. bateria, chasis, vistas)..." class="w-full bg-white border border-[#00000014] rounded-xl px-4 py-2.5 pl-10 text-sm text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition shadow-sm">
           <svg class="w-4 h-4 text-[#86868b] absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
           </svg>
         </div>
       </div>
 
-      <!-- Lista de Archivos -->
-      <div class="apple-card divide-y divide-[#0000000d] overflow-hidden" id="lista-archivos-contenedor">
-        <!-- Renderizado dinámico de archivos -->
+      <!-- Contenedor del Árbol de Carpetas (macOS Finder) -->
+      <div class="space-y-4" id="contenedor-carpetas-finder">
+        <!-- Las carpetas y archivos se renderizan dinámicamente con app.js -->
       </div>
 
     </div>
