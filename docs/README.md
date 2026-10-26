@@ -8,26 +8,21 @@ Este panel web permite monitorizar en tiempo real el avance del proyecto, consul
 
 No necesitas instalar Node.js ni ningún servidor web. Puedes abrirlo directamente:
 
-1. Ve a la carpeta `dashboard/` en el explorador de archivos.
+1. Ve a la carpeta `docs/` en el explorador de archivos.
 2. Haz **doble clic** sobre [`index.html`](index.html) para abrirlo en tu navegador favorito (Chrome, Edge, Firefox, etc.).
 3. ¡Listo! La web se conectará automáticamente con la API pública de GitHub para cargar los datos del repositorio:
-   - Contribuidores reales.
+   - Contribuidores reales unificados.
    - Historial de commits.
    - Ramas de trabajo activas.
 
-> **Nota sobre el límite de GitHub**: GitHub permite hasta 60 peticiones/hora sin autenticación. La web incorpora una caché interna de 5 minutos y datos de demostración automáticos por si en algún momento se alcanza el límite. Si lo deseas, puedes añadir un Personal Access Token (PAT) haciendo clic en el botón *"Token"* del encabezado.
-
 ---
 
-## 🌐 Cómo publicarlo gratis en GitHub Pages (para todo el equipo)
+## 🌐 Publicación en GitHub Pages
 
-Para que cualquier compañero o el profesor pueda abrir la web desde su móvil o PC sin descargar nada:
+La carpeta `docs/` es el estándar nativo de GitHub Pages:
 
 1. Ve a tu repositorio en GitHub: `https://github.com/pprguez2005-byte/Coche-sysml-`
-2. Haz clic en la pestaña **Settings** (Ajustes).
-3. En el menú lateral izquierdo, haz clic en **Pages**.
-4. En **Build and deployment** > **Source**:
-   - Selecciona **Deploy from a branch**.
-   - Branch: `main` (o `dashboard-seguimiento`).
-   - Carpeta: selecciona `/dashboard` (o `/ (root)` si mueves los archivos a la raíz o a `/docs`).
-5. Pulsa en **Save**. En un par de minutos tendrás tu enlace web público listo (ej. `https://pprguez2005-byte.github.io/Coche-sysml-/dashboard/`).
+2. Pestaña **Settings** > **Pages**.
+3. En **Source**: `Deploy from a branch`.
+4. En **Branch**: `main` y carpeta `/docs`.
+5. Pulsa en **Save**. En un par de minutos tu web estará disponible en `https://pprguez2005-byte.github.io/Coche-sysml-/`.
