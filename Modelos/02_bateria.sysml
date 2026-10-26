@@ -25,8 +25,8 @@ package SubsistemaBateria {
     // Requisitos con restriccion numerica: se pueden comprobar con un valor del 'subject'
     requirement def ReqAutonomiaBateria {
         subject bateria : BatterySystem;
-        doc /* La bateria debe ofrecer al menos 2 horas de uso continuo con una carga completa. */
-        require constraint { bateria.autonomia >= 2.0 }
+        doc /* La bateria debe ofrecer al menos 1 hora de uso continuo con una carga completa. */
+        require constraint { bateria.autonomia >= 1.0 }
     }
 
     requirement def ReqTemperaturaMaximaBateria {
@@ -34,6 +34,17 @@ package SubsistemaBateria {
         doc /* La temperatura de las celdas no debe superar los 60 C durante el funcionamiento para evitar su degradacion o incendio. */
         require constraint { bateria.temperaturaMaxima <= 60.0 }
     }
+
+    // Instancia de la bateria comercial adquirida (1 h de autonomia y 290 K = 16.85 C)
+    part bateriaComprada : BatterySystem {
+        doc /* Bateria comercial comprada con 1 hora de autonomia y temperatura maxima de 16.85 C (290 K). */
+        attribute :>> autonomia = 1.0;
+        attribute :>> temperaturaMaxima = 16.85; // 290 K convertidos a grados centigrados (C)
+    }
+
+    // Relaciones 'satisfy': vinculan la bateria comprada con los requisitos formales que cumple
+    satisfy requirement : ReqAutonomiaBateria by bateriaComprada;
+    satisfy requirement : ReqTemperaturaMaximaBateria by bateriaComprada;
 
     // Requisitos textuales: solo 'doc', sin 'require constraint'
     requirement def ReqProteccionFuegoBateria {

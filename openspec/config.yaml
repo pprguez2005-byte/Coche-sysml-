@@ -14,6 +14,7 @@ context: |
     2. opsx-apply: Implementar las tareas aprobadas en los archivos .sysml.
     3. opsx-archive: Consolidar las especificaciones en openspec/specs/ y archivar el cambio antes o después de integrar la rama.
   - Ningún colaborador ni asistente de IA debe editar directamente archivos en 'Modelos/' sin una propuesta aprobada en 'openspec/changes/'.
+  - PROTECCIÓN DE REQUISITOS: Si cualquier petición o componente nuevo requiere modificar, rebajar o eliminar un requisito existente (en 'Modelos/*.sysml' o en 'openspec/specs/'), el agente debe detenerse antes de ejecutar, emitir un fallo/aviso explícito e informar al usuario para que confirme que es consciente de que está modificando un requisito.
 
   Límites y condiciones del proyecto:
   - El sistema modelado es un vehículo eléctrico ligero muy sencillo (triciclo Tadpole) al que se añade complejidad de forma gradual.
@@ -31,8 +32,10 @@ rules:
     - Redactar en español con tono didáctico y claro para usuarios que están aprendiendo SysML v2, Git y OpenSpec.
     - Explicitar siempre el problema, la necesidad y los límites del alcance para evitar sobre-ingeniería.
     - Identificar con precisión qué archivos de 'Modelos/' se verán afectados.
+    - Si se modifica un requisito existente, haber obtenido confirmación explícita previa del usuario y justificar por qué se altera.
   specs:
     - Limitar cada especificación a pocos requisitos (2 a 4 máximo), claros y verificables en Spec42.
+    - No incluir bloques MODIFIED sobre requisitos existentes sin confirmación explícita previa del usuario.
   design:
     - Explicar el porqué sintáctico de cada construcción SysML v2 propuesta.
   tasks:

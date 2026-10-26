@@ -19,3 +19,9 @@ Antes de realizar cualquier modificación en los modelos del proyecto, **DEBES**
   - Usar siempre `private import` en cada paquete `.sysml`.
   - Las temperaturas (`Temperature`) se expresan siempre en **grados centígrados (°C)**.
   - Validar siempre la sintaxis SysML v2 y la generación de vistas de **Spec42** antes de dar por completada una implementación.
+
+## 3. Protección de Requisitos Existentes (Bloqueo y Confirmación)
+- Siempre que un prompt o cambio solicitado implique **modificar, relajar o eliminar un requisito existente** (`requirement def` en `Modelos/*.sysml` o un requisito consolidado en `openspec/specs/`) o introduzca un componente que incumpla un requisito vigente:
+  1. **DETENTE inmediatamente** antes de crear o actualizar propuestas de OpenSpec o editar cualquier archivo.
+  2. **Emite un fallo/alerta de bloqueo (`[FALLO DE VALIDACIÓN: MODIFICACIÓN DE REQUISITO]`)** detallando qué requisito se ve afectado, cuál es su condición actual y cuál sería la nueva.
+  3. **Solicita confirmación explícita** al usuario para verificar que desea alterar el requisito y que es plenamente consciente del impacto antes de continuar.
