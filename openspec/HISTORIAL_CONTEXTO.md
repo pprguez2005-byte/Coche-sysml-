@@ -13,6 +13,7 @@
 | **v2** | 2026-10-19 | `e00e03f` | `juanuniovi` | Propósito de PoC formativa (aprender SysML v2 en modo texto, Git colaborativo y OpenSpec) • Límites de diseño: vehículo Tadpole ligero con incrementos didácticos pequeños (máx. 2-3 piezas) • Entorno núcleo de trabajo: VS Code + Spec42 con archivos .sysml como única fuente de verdad |
 | **v3** | 2026-10-22 | `4851bcd` | `evjose` | Estandarización de magnitudes: temperaturas medidas obligatoriamente en grados Celsius (°C) |
 | **v4** | 2026-10-22 | `509e181` | `juanuniovi` | Protocolo de equipo: trabajo obligatorio en ramas Git (`git checkout -b`), prohibido editar 'main' directamente • Ciclo estricto OpenSpec: prohibido modificar 'Modelos/' sin propuesta previa aprobada (propose → apply → archive) |
+| **v5** | 2026-10-26 | `c4b0a96` | `Eloy Suárez Costales` | Actualización: - PROTECCIÓN DE REQUISITOS: Si cualquier petición o componente nuevo requiere modificar, rebajar o eliminar un requisito existente (en 'Modelos/*.sysml' o en 'openspec/specs/'), el agente debe detenerse antes de ejecutar, emitir un fallo/aviso explícito e informar al usuario para que confirme que es consciente de que está modificando un requisito. |
 
 ---
 
@@ -66,4 +67,12 @@
   * `- Ningún colaborador ni asistente de IA debe editar directamente archivos en 'Modelos/' sin una propuesta aprobada en 'openspec/changes/'.`
   * `- Idioma: redactar todos los artefactos y explicaciones en español técnico.`
   * `- Las temperaturas se miden siempre en grados centígrados (Celsius): los atributos y constraints de tipo Temperature están en °C.`
+
+### [v5] Revisión `c4b0a96` — 2026-10-26
+* **Autor**: `Eloy Suárez Costales`
+* **Mensaje de commit**: Merge branch 'feat/bateria-autonomia-1h' into main
+* **Aporte clave al contexto común**:
+  > Actualización: - PROTECCIÓN DE REQUISITOS: Si cualquier petición o componente nuevo requiere modificar, rebajar o eliminar un requisito existente (en 'Modelos/*.sysml' o en 'openspec/specs/'), el agente debe detenerse antes de ejecutar, emitir un fallo/aviso explícito e informar al usuario para que confirme que es consciente de que está modificando un requisito.
+* **Líneas añadidas relevantes al bloque `context:`**:
+  * `- PROTECCIÓN DE REQUISITOS: Si cualquier petición o componente nuevo requiere modificar, rebajar o eliminar un requisito existente (en 'Modelos/*.sysml' o en 'openspec/specs/'), el agente debe detenerse antes de ejecutar, emitir un fallo/aviso explícito e informar al usuario para que confirme que es consciente de que está modificando un requisito.`
 
