@@ -1,6 +1,7 @@
 /**
- * Coche SysML v2 — Panel de Control
- * Diseño y Arquitectura inspirados en Apple Human Interface Guidelines
+ * Coche SysML v2 — Panel de Control y Seguimiento
+ * Arquitectura y Diseño estilo Apple Human Interface Guidelines
+ * Sincronización Remota de Tareas con GitHub Issues
  */
 
 const REPO_OWNER = "pprguez2005-byte";
@@ -154,6 +155,13 @@ const ARCHIVOS_REPOSITORIO = [
     descripcion: "Documentación principal y guía didáctica del proyecto",
     autorId: "cesar",
     tipo: "Markdown"
+  },
+  {
+    path: "GUIA_TOKEN_GITHUB.md",
+    categoria: "docs/",
+    descripcion: "Guía didáctica sobre el Token de Acceso Personal (PAT) de GitHub",
+    autorId: "pelayo",
+    tipo: "Markdown"
   }
 ];
 
@@ -164,20 +172,26 @@ let estadoApp = {
   ramas: [],
   pullRequests: [],
   tareas: [],
+  origenTareas: "github", // github | cache | local
+  syncStatus: "cargando", // conectado | cargando | offline | local
+  tareaPendienteCrear: null,
   filtroTareas: "todas", // todas | pendientes | completadas
   filtroArchivos: "todos", // todos | Modelos/ | openspec/ | docs/
   busquedaArchivo: "",
   cargando: true
 };
 
+// ====================================================================
+// INICIALIZACIÓN
+// ====================================================================
 document.addEventListener("DOMContentLoaded", () => {
-  cargarTareasLocalStorage();
   configurarNavegacion();
-  inicializarDatos();
+  configurarModalesYEventos();
   configurarEventosArchivosYTareas();
+  inicializarDatos();
 });
 
-// Manejo de rutas con Hash para soportar navegación y botón Atrás del navegador
+// Manejo de rutas con Hash para navegación fluida
 function configurarNavegacion() {
   window.addEventListener("hashchange", procesarRutaActual);
 
@@ -205,6 +219,7 @@ function configurarNavegacion() {
     btnRecargar.addEventListener("click", () => {
       sessionStorage.clear();
       inicializarDatos();
+      mostrarToast("Datos actualizados desde el repositorio", "info");
     });
   }
 }
@@ -249,7 +264,54 @@ function mostrarSeccion(idSeccion) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// Carga de datos desde GitHub API con caché
+// ====================================================================
+// GESTIÓN DE TOKEN PERSONAL DE GITHUB (PAT)
+// ====================================================================
+function obtenerGitHubToken() {
+  return localStorage.getItem("sysml_github_token") || "";
+}
+
+function guardarGitHubToken(token) {
+  if (token && token.trim()) {
+    localStorage.setItem("sysml_github_token", token.trim());
+  } else {
+    localStorage.removeItem("sysml_github_token");
+  }
+  actualizarUIModalToken();
+}
+
+function eliminarGitHubToken() {
+  localStorage.removeItem("sysml_github_token");
+  actualizarUIModalToken();
+  mostrarToast("Token eliminado. Modo lectura activa.", "info");
+}
+
+function actualizarUIModalToken() {
+  const token = obtenerGitHubToken();
+  const input = document.getElementById("input-github-token");
+  const badge = document.getElementById("badge-token-status");
+  const btnEliminar = document.getElementById("btn-eliminar-token");
+
+  if (input) {
+    input.value = token ? "••••••••••••••••••••••••••••••••" : "";
+  }
+  if (badge) {
+    if (token) {
+      badge.textContent = "Token activo (Lectura y Escritura)";
+      badge.className = "text-[#34c759] font-medium";
+    } else {
+      badge.textContent = "Sin token (Modo lectura)";
+      badge.className = "text-[#86868b] font-mono";
+    }
+  }
+  if (btnEliminar) {
+    btnEliminar.classList.toggle("hidden", !token);
+  }
+}
+
+// ====================================================================
+// CARGA DE DATOS DE LA API DE GITHUB (MÉTRICAS, COMMITS Y TAREAS)
+// ====================================================================
 async function inicializarDatos() {
   mostrarLoader(true);
   try {
@@ -269,7 +331,9 @@ async function inicializarDatos() {
     renderizarGridMiembros();
     renderizarTimelineGlobal();
     renderizarArchivos();
-    renderizarTareas();
+
+    // Carga asíncrona colaborativa de tareas desde GitHub Issues
+    await cargarTareas();
 
     procesarRutaActual();
 
@@ -291,7 +355,15 @@ async function fetchConCache(url) {
     return JSON.parse(guardado);
   }
 
-  const res = await fetch(url);
+  const headers = {
+    "Accept": "application/vnd.github.v3+json"
+  };
+  const token = obtenerGitHubToken();
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(url, { headers });
   if (!res.ok) throw new Error(`HTTP error ${res.status}`);
   const data = await res.json();
   sessionStorage.setItem(cacheKey, JSON.stringify(data));
@@ -388,6 +460,7 @@ function renderizarMetricas() {
 
 function renderizarGridMiembros() {
   const container = document.getElementById("grid-miembros");
+  if (!container) return;
   container.innerHTML = "";
 
   estadoApp.miembros.forEach(m => {
@@ -439,6 +512,7 @@ function renderizarGridMiembros() {
 
 function renderizarTimelineGlobal() {
   const container = document.getElementById("timeline-global");
+  if (!container) return;
   container.innerHTML = "";
 
   const recientes = estadoApp.commits.slice(0, 6);
@@ -517,7 +591,6 @@ function mostrarVistaMiembro(idOMiembro) {
         </div>
         <span class="text-xs text-[#86868b]">${formatearFechaRelativa(miembro.ultimoCommit.fecha)}</span>
       </div>
-
       <div class="bg-[#f5f5f7] border border-[#0000000d] rounded-xl p-4 mt-2">
         <p class="text-sm font-medium text-[#1d1d1f] leading-relaxed">
           ${escapeHtml(miembro.ultimoCommit.mensaje)}
@@ -570,11 +643,9 @@ function renderizarArchivos() {
   container.innerHTML = "";
 
   const filtrados = ARCHIVOS_REPOSITORIO.filter(item => {
-    // Filtro por categoría
     if (estadoApp.filtroArchivos !== "todos" && item.categoria !== estadoApp.filtroArchivos) {
       return false;
     }
-    // Filtro por búsqueda
     if (estadoApp.busquedaArchivo) {
       const q = estadoApp.busquedaArchivo.toLowerCase();
       return item.path.toLowerCase().includes(q) || 
@@ -594,7 +665,6 @@ function renderizarArchivos() {
     const row = document.createElement("div");
     row.className = "p-4 hover:bg-[#f5f5f7] transition flex flex-col sm:flex-row sm:items-center justify-between gap-3";
 
-    // Icono según tipo
     const iconoColor = file.tipo === "SysML v2" ? "text-purple-600 bg-purple-50" : (file.tipo === "OpenSpec" ? "text-blue-600 bg-blue-50" : "text-emerald-600 bg-emerald-50");
 
     row.innerHTML = `
@@ -612,7 +682,6 @@ function renderizarArchivos() {
       </div>
 
       <div class="flex items-center justify-between sm:justify-end space-x-4 shrink-0 pl-12 sm:pl-0">
-        <!-- Tarjeta de autoría -->
         <div class="flex items-center space-x-2">
           <img src="${autor.avatar}" alt="${autor.nombre}" class="w-6 h-6 rounded-full border border-[#00000014] object-cover bg-white">
           <div class="text-left">
@@ -635,67 +704,212 @@ function renderizarArchivos() {
 }
 
 // ====================================================================
-// SECCIÓN 4: GESTOR DE TAREAS (TO-DO / RECORDATORIOS APPLE)
+// SECCIÓN 4: GESTOR DE TAREAS Y SINCRONIZACIÓN CON GITHUB ISSUES
 // ====================================================================
-function cargarTareasLocalStorage() {
-  const guardado = localStorage.getItem("sysml_tareas_equipo");
-  if (guardado) {
-    try {
-      estadoApp.tareas = JSON.parse(guardado);
-      return;
-    } catch (e) {
-      console.warn("Error leyendo tareas locales:", e);
-    }
-  }
 
-  // Tareas iniciales por defecto orientadas al proyecto
-  estadoApp.tareas = [
+function obtenerTareasPorDefecto() {
+  return [
     {
       id: "t1",
+      numero: null,
       texto: "Verificar vista gráfica de estados de batería en Spec42",
       miembroId: "jose",
-      categoria: "Vistas",
       completada: true,
-      fecha: "25 Oct"
+      fecha: "25 Oct",
+      url: `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues`,
+      origen: "local"
     },
     {
       id: "t2",
+      numero: null,
       texto: "Modelar requisitos cinemáticos del subsistema de dirección",
       miembroId: "juan",
-      categoria: "Requisitos",
       completada: false,
-      fecha: "26 Oct"
+      fecha: "26 Oct",
+      url: `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues`,
+      origen: "local"
     },
     {
       id: "t3",
+      numero: null,
       texto: "Comprobar balance de masa total en 06_triciclo.sysml",
       miembroId: "pelayo",
-      categoria: "Modelado",
       completada: false,
-      fecha: "26 Oct"
+      fecha: "26 Oct",
+      url: `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues`,
+      origen: "local"
     },
     {
       id: "t4",
+      numero: null,
       texto: "Revisar transiciones de los modos operativos en 08_comportamiento.sysml",
       miembroId: "eloy",
-      categoria: "Modelado",
       completada: false,
-      fecha: "26 Oct"
+      fecha: "26 Oct",
+      url: `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues`,
+      origen: "local"
     },
     {
       id: "t5",
+      numero: null,
       texto: "Documentar flujo de trabajo Git y OpenSpec en el README",
       miembroId: "cesar",
-      categoria: "Documentación",
       completada: true,
-      fecha: "24 Oct"
+      fecha: "24 Oct",
+      url: `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues`,
+      origen: "local"
     }
   ];
-  guardarTareasLocalStorage();
 }
 
-function guardarTareasLocalStorage() {
-  localStorage.setItem("sysml_tareas_equipo", JSON.stringify(estadoApp.tareas));
+async function cargarTareasDesdeGitHub() {
+  const token = obtenerGitHubToken();
+  const headers = {
+    "Accept": "application/vnd.github.v3+json"
+  };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues?state=all&per_page=100`;
+  const cacheKey = "cache_gh_issues";
+  const expKey = "exp_gh_issues";
+
+  let issues = null;
+  try {
+    const res = await fetch(url, { headers });
+    if (res.ok) {
+      issues = await res.json();
+      sessionStorage.setItem(cacheKey, JSON.stringify(issues));
+      sessionStorage.setItem(expKey, (Date.now() + 2 * 60 * 1000).toString());
+    } else if (res.status === 403) {
+      console.warn("GitHub API rate limit alcanzado. Usando caché local.");
+    }
+  } catch (err) {
+    console.warn("Aviso: Conexión con GitHub Issues no disponible:", err);
+  }
+
+  if (!issues) {
+    const guardado = sessionStorage.getItem(cacheKey);
+    if (guardado) {
+      try { issues = JSON.parse(guardado); } catch(e){}
+    }
+  }
+
+  return issues;
+}
+
+function mapearIssuesATareas(rawIssues) {
+  if (!Array.isArray(rawIssues)) return [];
+
+  // Filtrar Pull Requests (la API de GitHub los devuelve como issues con propiedad pull_request)
+  const issuesPuros = rawIssues.filter(item => !item.pull_request);
+
+  return issuesPuros.map(item => {
+    let loginAsignado = null;
+    if (item.assignee && item.assignee.login) {
+      loginAsignado = item.assignee.login;
+    } else if (Array.isArray(item.assignees) && item.assignees.length > 0) {
+      loginAsignado = item.assignees[0].login;
+    } else if (item.user && item.user.login) {
+      loginAsignado = item.user.login;
+    }
+
+    const miembro = encontrarIntegrante(loginAsignado) || EQUIPO_CANONICO[0];
+
+    return {
+      id: "gh_" + item.number,
+      numero: item.number,
+      texto: item.title,
+      miembroId: miembro.id,
+      completada: item.state === "closed",
+      fecha: formatearFechaRelativa(item.created_at),
+      url: item.html_url,
+      origen: "github"
+    };
+  });
+}
+
+async function cargarTareas() {
+  actualizarIndicadorSync("cargando", "Consultando GitHub...");
+
+  let tareasRemotas = [];
+  const issuesRaw = await cargarTareasDesdeGitHub();
+
+  if (issuesRaw) {
+    tareasRemotas = mapearIssuesATareas(issuesRaw);
+  }
+
+  if (tareasRemotas.length > 0) {
+    estadoApp.tareas = tareasRemotas;
+    estadoApp.origenTareas = "github";
+    localStorage.setItem("sysml_tareas_cache_github", JSON.stringify(tareasRemotas));
+    actualizarIndicadorSync("conectado", `GitHub Issues (${tareasRemotas.length})`);
+  } else {
+    // Si no hay issues de tareas en el repositorio o hubo limitación de tasa:
+    const cachePrevia = localStorage.getItem("sysml_tareas_cache_github");
+    if (cachePrevia) {
+      try {
+        estadoApp.tareas = JSON.parse(cachePrevia);
+        estadoApp.origenTareas = "cache";
+        actualizarIndicadorSync("conectado", "Caché GitHub");
+        renderizarTareas();
+        return;
+      } catch (e) {}
+    }
+
+    // Tareas base locales
+    const guardadoLocal = localStorage.getItem("sysml_tareas_locales");
+    if (guardadoLocal) {
+      try {
+        estadoApp.tareas = JSON.parse(guardadoLocal);
+      } catch (e) {
+        estadoApp.tareas = obtenerTareasPorDefecto();
+      }
+    } else {
+      estadoApp.tareas = obtenerTareasPorDefecto();
+    }
+    estadoApp.origenTareas = "local";
+    actualizarIndicadorSync("local", "Modo Local");
+  }
+
+  renderizarTareas();
+}
+
+function actualizarIndicadorSync(estado, texto) {
+  estadoApp.syncStatus = estado;
+  const dot = document.getElementById("sync-indicator-dot");
+  const txt = document.getElementById("sync-status-texto");
+  const bannerTxt = document.getElementById("banner-sync-texto");
+
+  if (dot) {
+    dot.className = "w-2 h-2 rounded-full";
+    if (estado === "conectado") {
+      dot.classList.add("bg-[#34c759]");
+    } else if (estado === "cargando") {
+      dot.classList.add("bg-[#ff9500]", "animate-pulse");
+    } else if (estado === "local") {
+      dot.classList.add("bg-[#0071e3]");
+    } else {
+      dot.classList.add("bg-[#86868b]");
+    }
+  }
+
+  if (txt) {
+    txt.textContent = texto || "GitHub Issues";
+  }
+
+  if (bannerTxt) {
+    if (estado === "conectado") {
+      bannerTxt.innerHTML = `<strong>Sincronización activa con GitHub Issues:</strong> Tareas compartidas en tiempo real. Cualquier compañero las ve al abrir la web en su ordenador.`;
+    } else if (estado === "local") {
+      bannerTxt.innerHTML = `<strong>Modo local activo:</strong> Aún no hay incidencias creadas en el repositorio. Las nuevas tareas se pueden publicar en GitHub con un solo clic.`;
+    }
+  }
+}
+
+function guardarTareasLocales() {
+  localStorage.setItem("sysml_tareas_locales", JSON.stringify(estadoApp.tareas));
 }
 
 function renderizarTareas() {
@@ -709,7 +923,7 @@ function renderizarTareas() {
     return true;
   });
 
-  // Actualizar conteos en los botones
+  // Conteo de tareas
   const total = estadoApp.tareas.length;
   const pendientes = estadoApp.tareas.filter(t => !t.completada).length;
   const completadas = estadoApp.tareas.filter(t => t.completada).length;
@@ -721,7 +935,7 @@ function renderizarTareas() {
   if (filtradas.length === 0) {
     container.innerHTML = `
       <div class="p-10 text-center text-xs text-[#86868b]">
-        No hay tareas en esta sección. Añade una nueva tarea arriba.
+        No hay tareas en esta vista. Asigna una nueva tarea arriba para que tu compañero la vea en su equipo.
       </div>
     `;
     return;
@@ -732,24 +946,28 @@ function renderizarTareas() {
     const row = document.createElement("div");
     row.className = "p-4 hover:bg-[#f5f5f7] transition flex items-center justify-between gap-3 group";
 
+    const badgeNumeroIssue = tarea.numero 
+      ? `<a href="${tarea.url}" target="_blank" rel="noopener noreferrer" class="font-mono text-[11px] text-[#0071e3] hover:underline bg-[#0071e30f] px-2 py-0.5 rounded border border-[#0071e31a]">#${tarea.numero}</a>`
+      : `<span class="text-[10px] text-[#86868b] bg-[#00000008] px-1.5 py-0.5 rounded">Local</span>`;
+
     row.innerHTML = `
       <div class="flex items-center space-x-3.5 min-w-0">
         <!-- Checkbox circular estilo Apple Reminders -->
-        <button class="apple-checkbox ${tarea.completada ? 'checked' : ''}" data-id="${tarea.id}">
+        <button class="apple-checkbox ${tarea.completada ? 'checked' : ''}" data-id="${tarea.id}" title="${tarea.completada ? 'Marcar como pendiente' : 'Marcar como completada'}">
           <svg fill="none" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
           </svg>
         </button>
 
         <div class="min-w-0">
-          <p class="text-sm font-medium ${tarea.completada ? 'line-through text-[#86868b]' : 'text-[#1d1d1f]'} leading-tight truncate">
-            ${escapeHtml(tarea.texto)}
-          </p>
+          <div class="flex items-center gap-2">
+            ${badgeNumeroIssue}
+            <p class="text-sm font-medium ${tarea.completada ? 'line-through text-[#86868b]' : 'text-[#1d1d1f]'} leading-tight truncate">
+              ${escapeHtml(tarea.texto)}
+            </p>
+          </div>
           <div class="flex items-center gap-2 mt-1">
-            <span class="text-[11px] px-2 py-0.2 rounded-full bg-[#00000008] text-[#86868b] font-medium">
-              ${tarea.categoria}
-            </span>
-            <span class="text-[11px] text-[#86868b]">${tarea.fecha || "Hoy"}</span>
+            <span class="text-[11px] text-[#86868b]">${tarea.fecha || "Reciente"}</span>
           </div>
         </div>
       </div>
@@ -761,6 +979,15 @@ function renderizarTareas() {
           <span class="text-xs font-medium text-[#1d1d1f]">${miembro.nombre.split(" ")[0]}</span>
         </div>
 
+        <!-- Enlace a GitHub si existe -->
+        ${tarea.url ? `
+          <a href="${tarea.url}" target="_blank" rel="noopener noreferrer" class="text-[#86868b] hover:text-[#0071e3] p-1 transition" title="Abrir en GitHub">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+          </a>
+        ` : ''}
+
         <!-- Botón eliminar tarea -->
         <button class="btn-eliminar-tarea text-[#86868b] hover:text-red-500 p-1 opacity-40 group-hover:opacity-100 transition" data-id="${tarea.id}" title="Eliminar tarea">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -770,22 +997,255 @@ function renderizarTareas() {
       </div>
     `;
 
-    // Evento de checkbox
+    // Conmutar estado de tarea
     row.querySelector(".apple-checkbox").addEventListener("click", () => {
-      tarea.completada = !tarea.completada;
-      guardarTareasLocalStorage();
-      renderizarTareas();
+      conmutarEstadoTarea(tarea);
     });
 
-    // Evento de eliminar
+    // Eliminar tarea
     row.querySelector(".btn-eliminar-tarea").addEventListener("click", () => {
-      estadoApp.tareas = estadoApp.tareas.filter(t => t.id !== tarea.id);
-      guardarTareasLocalStorage();
-      renderizarTareas();
+      eliminarTarea(tarea);
     });
 
     container.appendChild(row);
   });
+}
+
+async function conmutarEstadoTarea(tarea) {
+  const nuevoEstado = !tarea.completada;
+  tarea.completada = nuevoEstado;
+  renderizarTareas();
+
+  if (tarea.origen === "github" && tarea.numero) {
+    const token = obtenerGitHubToken();
+    if (token) {
+      try {
+        const stateStr = nuevoEstado ? "closed" : "open";
+        const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${tarea.numero}`, {
+          method: "PATCH",
+          headers: {
+            "Accept": "application/vnd.github.v3+json",
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ state: stateStr })
+        });
+        if (res.ok) {
+          sessionStorage.removeItem("cache_gh_issues");
+          mostrarToast(nuevoEstado ? `Issue #${tarea.numero} cerrado en GitHub` : `Issue #${tarea.numero} reabierto`, "exito");
+          return;
+        }
+      } catch (e) {
+        console.warn("Error conmutando estado en GitHub:", e);
+      }
+    }
+
+    // Si no hay token configurado
+    mostrarToast(`Estado cambiado localmente. Para guardarlo en GitHub, abre el <a href="${tarea.url}" target="_blank" class="underline font-bold text-white">Issue #${tarea.numero}</a>`, "info");
+  } else {
+    guardarTareasLocales();
+  }
+}
+
+function eliminarTarea(tarea) {
+  estadoApp.tareas = estadoApp.tareas.filter(t => t.id !== tarea.id);
+  if (tarea.origen === "github") {
+    mostrarToast(`Tarea removida de la vista local.`, "info");
+  } else {
+    guardarTareasLocales();
+    mostrarToast("Tarea eliminada", "info");
+  }
+  renderizarTareas();
+}
+
+async function procesarCreacionTarea(texto, miembroId) {
+  const miembro = EQUIPO_CANONICO.find(m => m.id === miembroId) || EQUIPO_CANONICO[0];
+  const token = obtenerGitHubToken();
+
+  if (token) {
+    try {
+      mostrarToast("Creando tarea en GitHub Issues...", "info");
+      const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues`, {
+        method: "POST",
+        headers: {
+          "Accept": "application/vnd.github.v3+json",
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          title: texto,
+          body: `Tarea asignada desde el Panel de Control Web a @${miembro.loginPrincipal}.\n\n- **Responsable:** ${miembro.nombre} (@${miembro.loginPrincipal})\n\n_Registrada colaborativamente mediante la interfaz del Coche SysML v2._`,
+          assignees: [miembro.loginPrincipal],
+          labels: ["tarea"]
+        })
+      });
+
+      if (res.ok) {
+        sessionStorage.removeItem("cache_gh_issues");
+        mostrarToast("¡Tarea creada en GitHub y visible para todo el equipo!", "exito");
+        await cargarTareas();
+        return;
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        mostrarToast(`Aviso GitHub: ${errorData.message || res.statusText}`, "error");
+      }
+    } catch (err) {
+      mostrarToast("Error de conexión al crear en GitHub", "error");
+    }
+  }
+
+  // Si no hay token configurado o falló: abrir opciones asistidas
+  abrirModalOpcionesCreacion(texto, miembro);
+}
+
+function abrirModalOpcionesCreacion(texto, miembro) {
+  estadoApp.tareaPendienteCrear = { texto, miembro };
+
+  const modal = document.getElementById("modal-crear-opciones");
+  const resumen = document.getElementById("modal-crear-resumen");
+  if (resumen) {
+    resumen.innerHTML = `Asignar: <strong class="text-[#1d1d1f]">"${escapeHtml(texto)}"</strong> a <strong class="text-[#0071e3]">${miembro.nombre}</strong>.`;
+  }
+  if (modal) modal.classList.remove("hidden");
+}
+
+function configurarModalesYEventos() {
+  // Modal de Ajustes Sync
+  const btnSyncAjustes = document.getElementById("btn-sync-ajustes");
+  const modalSync = document.getElementById("modal-sync-ajustes");
+  const btnCerrarModalSync = document.getElementById("btn-cerrar-modal-sync");
+  const btnGuardarToken = document.getElementById("btn-guardar-token");
+  const btnEliminarToken = document.getElementById("btn-eliminar-token");
+  const btnForzarRecarga = document.getElementById("btn-forzar-recarga-modal");
+  const btnBannerSync = document.getElementById("btn-banner-forzar-sync");
+
+  if (btnSyncAjustes && modalSync) {
+    btnSyncAjustes.addEventListener("click", () => {
+      actualizarUIModalToken();
+      modalSync.classList.remove("hidden");
+    });
+  }
+
+  if (btnCerrarModalSync && modalSync) {
+    btnCerrarModalSync.addEventListener("click", () => {
+      modalSync.classList.add("hidden");
+    });
+  }
+
+  if (btnGuardarToken) {
+    btnGuardarToken.addEventListener("click", async () => {
+      const input = document.getElementById("input-github-token");
+      const valor = input.value.trim();
+      if (valor && !valor.startsWith("•••")) {
+        guardarGitHubToken(valor);
+        mostrarToast("Token guardado de forma privada en tu navegador", "exito");
+      }
+      modalSync.classList.add("hidden");
+      sessionStorage.clear();
+      await cargarTareas();
+    });
+  }
+
+  if (btnEliminarToken) {
+    btnEliminarToken.addEventListener("click", () => {
+      eliminarGitHubToken();
+      modalSync.classList.add("hidden");
+    });
+  }
+
+  if (btnForzarRecarga) {
+    btnForzarRecarga.addEventListener("click", async () => {
+      sessionStorage.removeItem("cache_gh_issues");
+      await cargarTareas();
+      mostrarToast("Tareas actualizadas desde GitHub", "info");
+      modalSync.classList.add("hidden");
+    });
+  }
+
+  if (btnBannerSync) {
+    btnBannerSync.addEventListener("click", async () => {
+      sessionStorage.removeItem("cache_gh_issues");
+      await cargarTareas();
+      mostrarToast("Tareas sincronizadas", "info");
+    });
+  }
+
+  // Modal de Opciones al Crear
+  const modalCrear = document.getElementById("modal-crear-opciones");
+  const btnCerrarCrear = document.getElementById("btn-cerrar-modal-crear");
+  const btnCrearGithub = document.getElementById("btn-modal-crear-github");
+  const btnConfigurarToken = document.getElementById("btn-modal-configurar-token");
+  const btnGuardarLocal = document.getElementById("btn-modal-guardar-local");
+
+  if (btnCerrarCrear && modalCrear) {
+    btnCerrarCrear.addEventListener("click", () => {
+      modalCrear.classList.add("hidden");
+    });
+  }
+
+  if (btnCrearGithub && modalCrear) {
+    btnCrearGithub.addEventListener("click", () => {
+      const p = estadoApp.tareaPendienteCrear;
+      if (!p) return;
+
+      const bodyTexto = `Tarea asignada desde el Panel de Control Web a @${p.miembro.loginPrincipal}.\n\n- **Responsable:** ${p.miembro.nombre}`;
+      const urlIssue = `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/new?title=${encodeURIComponent(p.texto)}&body=${encodeURIComponent(bodyTexto)}&labels=tarea&assignees=${encodeURIComponent(p.miembro.loginPrincipal)}`;
+      
+      window.open(urlIssue, "_blank");
+
+      // Añadir de forma provisional en local
+      const tareaProvisional = {
+        id: "t_" + Date.now(),
+        numero: null,
+        texto: p.texto,
+        miembroId: p.miembro.id,
+        completada: false,
+        fecha: "Pendiente en GitHub",
+        url: `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues`,
+        origen: "local"
+      };
+      estadoApp.tareas.unshift(tareaProvisional);
+      guardarTareasLocales();
+      renderizarTareas();
+
+      modalCrear.classList.add("hidden");
+      mostrarToast("Ventana de GitHub abierta. Pulsa 'Submit new issue' para publicar para todos.", "info");
+    });
+  }
+
+  if (btnConfigurarToken && modalCrear) {
+    btnConfigurarToken.addEventListener("click", () => {
+      modalCrear.classList.add("hidden");
+      if (modalSync) {
+        actualizarUIModalToken();
+        modalSync.classList.remove("hidden");
+      }
+    });
+  }
+
+  if (btnGuardarLocal && modalCrear) {
+    btnGuardarLocal.addEventListener("click", () => {
+      const p = estadoApp.tareaPendienteCrear;
+      if (!p) return;
+
+      const tareaLocal = {
+        id: "t_" + Date.now(),
+        numero: null,
+        texto: p.texto,
+        miembroId: p.miembro.id,
+        completada: false,
+        fecha: "Hoy",
+        url: null,
+        origen: "local"
+      };
+      estadoApp.tareas.unshift(tareaLocal);
+      guardarTareasLocales();
+      renderizarTareas();
+
+      modalCrear.classList.add("hidden");
+      mostrarToast("Tarea guardada solo en este ordenador", "info");
+    });
+  }
 }
 
 function configurarEventosArchivosYTareas() {
@@ -844,28 +1304,16 @@ function configurarEventosArchivosYTareas() {
   // Formulario de nueva tarea
   const formTarea = document.getElementById("form-nueva-tarea");
   if (formTarea) {
-    formTarea.addEventListener("submit", (e) => {
+    formTarea.addEventListener("submit", async (e) => {
       e.preventDefault();
       const inputTexto = document.getElementById("input-tarea-texto");
       const selectMiembro = document.getElementById("select-tarea-miembro");
-      const selectCategoria = document.getElementById("select-tarea-categoria");
 
       const texto = inputTexto.value.trim();
       if (!texto) return;
 
-      const nuevaTarea = {
-        id: "t_" + Date.now(),
-        texto: texto,
-        miembroId: selectMiembro.value,
-        categoria: selectCategoria.value,
-        completada: false,
-        fecha: "Hoy"
-      };
-
-      estadoApp.tareas.unshift(nuevaTarea);
-      guardarTareasLocalStorage();
+      await procesarCreacionTarea(texto, selectMiembro.value);
       inputTexto.value = "";
-      renderizarTareas();
     });
   }
 }
@@ -894,6 +1342,10 @@ function usarDatosLocales() {
     { login: "juanuniovi", contributions: 1, avatar_url: "https://github.com/juanuniovi.png" }
   ], estadoApp.commits, estadoApp.ramas);
 
+  estadoApp.tareas = obtenerTareasPorDefecto();
+  estadoApp.origenTareas = "local";
+  actualizarIndicadorSync("local", "Modo Local");
+
   renderizarMetricas();
   renderizarGridMiembros();
   renderizarTimelineGlobal();
@@ -909,7 +1361,7 @@ function mostrarLoader(activo) {
 
 function formatearFechaRelativa(fecha) {
   const diffSegundos = Math.floor((Date.now() - new Date(fecha).getTime()) / 1000);
-  if (diffSegundos < 60) return "Hace un momento";
+  if (isNaN(diffSegundos) || diffSegundos < 60) return "Hace un momento";
   if (diffSegundos < 3600) return `Hace ${Math.floor(diffSegundos / 60)} min`;
   if (diffSegundos < 86400) return `Hace ${Math.floor(diffSegundos / 3600)} h`;
   const dias = Math.floor(diffSegundos / 86400);
@@ -927,4 +1379,35 @@ function escapeHtml(texto) {
       "'": '&#039;'
     }[m];
   });
+}
+
+function mostrarToast(mensaje, tipo = "info") {
+  const container = document.getElementById("apple-toast-container");
+  if (!container) return;
+
+  const toast = document.createElement("div");
+  toast.className = "apple-toast";
+
+  let icono = "";
+  if (tipo === "exito") {
+    icono = `<svg class="w-4 h-4 text-[#34c759] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+  } else if (tipo === "error") {
+    icono = `<svg class="w-4 h-4 text-[#ff3b30] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+  } else {
+    icono = `<svg class="w-4 h-4 text-[#0071e3] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+  }
+
+  toast.innerHTML = `
+    ${icono}
+    <div class="leading-tight">${mensaje}</div>
+  `;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(10px)";
+    toast.style.transition = "all 0.3s ease";
+    setTimeout(() => toast.remove(), 300);
+  }, 4500);
 }

@@ -1,1 +1,26 @@
 .DS_Store
+Thumbs.db
+
+# Claves, secretos, tokens y variables de entorno (APIs públicas y privadas)
+.env
+.env.*
+!.env.example
+*.env
+secrets/
+secrets.*
+secret.*
+credentials.json
+keys.json
+api_keys.json
+api_key.txt
+token.json
+tokens.json
+gh_token*
+github_token*
+*.token
+*.key
+*.pem
+*.cert
+config.local.json
+config.local.js
+local.settings.json
