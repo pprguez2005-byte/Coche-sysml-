@@ -25,6 +25,7 @@ context: |
   - Aunque puntualmente se prueben herramientas externas (Eclipse SysON, CATIA Magic), la fuente de verdad (núcleo) son siempre los archivos de texto .sysml en Git.
   - Idioma: redactar todos los artefactos y explicaciones en español técnico.
   - Las temperaturas se miden siempre en grados centígrados (Celsius): los atributos y constraints de tipo Temperature están en °C.
+  - Obligatoriedad de masa/peso: todo componente físico modelado debe incluir obligatoriamente su atributo de peso/masa real ('TiposBase::Mass' en kg). Si el usuario no lo define, la IA debe recordárselo, pedírselo o proponer un valor técnicamente plausible.
 
 # Per-artifact rules
 rules:
@@ -36,8 +37,10 @@ rules:
   specs:
     - Limitar cada especificación a pocos requisitos (2 a 4 máximo), claros y verificables en Spec42.
     - No incluir bloques MODIFIED sobre requisitos existentes sin confirmación explícita previa del usuario.
+    - Si se introducen o modifican componentes físicos, incluir requisitos o criterios de verificación sobre su masa/peso asignado.
   design:
     - Explicar el porqué sintáctico de cada construcción SysML v2 propuesta.
+    - Asegurar que todo componente físico cuente con su atributo de masa ('TiposBase::Mass') con valores reales y justificados.
   tasks:
     - Dividir las tareas en pasos pequeños, incrementales y fáciles de seguir y revisar en Git.
     - Incluir siempre una tarea final de validación de sintaxis SysML v2 y diagramas Spec42.

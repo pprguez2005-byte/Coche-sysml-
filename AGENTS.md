@@ -18,6 +18,10 @@ Antes de realizar cualquier modificación en los modelos del proyecto, **DEBES**
 - **Unidades y convenciones**:
   - Usar siempre `private import` en cada paquete `.sysml`.
   - Las temperaturas (`Temperature`) se expresan siempre en **grados centígrados (°C)**.
+  - **Masa y pesos realistas obligatorios**:
+    - Todo componente físico (`part def` / `part`) modelado en `Modelos/*.sysml` **DEBE** incluir obligatoriamente su atributo de masa/peso tipado con `TiposBase::Mass` (expresado en kilogramos, kg).
+    - Los valores asignados deben ser **reales y técnicamente plausibles** para los elementos de un vehículo ligero/triciclo.
+    - La IA tiene la **obligación de recordar y pedir activamente** al usuario o colaborador la asignación de este peso si no lo ha proporcionado en su petición o propuesta, sugiriendo un valor realista si es necesario.
   - Validar siempre la sintaxis SysML v2 y la generación de vistas de **Spec42** antes de dar por completada una implementación.
 
 ## 3. Protección de Requisitos Existentes (Bloqueo y Confirmación)
