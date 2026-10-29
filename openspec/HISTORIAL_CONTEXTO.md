@@ -14,6 +14,7 @@
 | **v3** | 2026-10-22 | `4851bcd` | `evjose` | Estandarización de magnitudes: temperaturas medidas obligatoriamente en grados Celsius (°C) |
 | **v4** | 2026-10-22 | `509e181` | `juanuniovi` | Protocolo de equipo: trabajo obligatorio en ramas Git (`git checkout -b`), prohibido editar 'main' directamente • Ciclo estricto OpenSpec: prohibido modificar 'Modelos/' sin propuesta previa aprobada (propose → apply → archive) |
 | **v5** | 2026-10-26 | `c4b0a96` | `Eloy Suárez Costales` | Actualización: - PROTECCIÓN DE REQUISITOS: Si cualquier petición o componente nuevo requiere modificar, rebajar o eliminar un requisito existente (en 'Modelos/*.sysml' o en 'openspec/specs/'), el agente debe detenerse antes de ejecutar, emitir un fallo/aviso explícito e informar al usuario para que confirme que es consciente de que está modificando un requisito. |
+| **v6** | 2026-10-29 | `40d3d92` | `evjose` | Actualización: - Obligatoriedad de masa/peso: todo componente físico modelado debe incluir obligatoriamente su atributo de peso/masa real ('TiposBase::Mass' en kg). Si el usuario no lo define, la IA debe recordárselo, pedírselo o proponer un valor técnicamente plausible. |
 
 ---
 
@@ -75,4 +76,12 @@
   > Actualización: - PROTECCIÓN DE REQUISITOS: Si cualquier petición o componente nuevo requiere modificar, rebajar o eliminar un requisito existente (en 'Modelos/*.sysml' o en 'openspec/specs/'), el agente debe detenerse antes de ejecutar, emitir un fallo/aviso explícito e informar al usuario para que confirme que es consciente de que está modificando un requisito.
 * **Líneas añadidas relevantes al bloque `context:`**:
   * `- PROTECCIÓN DE REQUISITOS: Si cualquier petición o componente nuevo requiere modificar, rebajar o eliminar un requisito existente (en 'Modelos/*.sysml' o en 'openspec/specs/'), el agente debe detenerse antes de ejecutar, emitir un fallo/aviso explícito e informar al usuario para que confirme que es consciente de que está modificando un requisito.`
+
+### [v6] Revisión `40d3d92` — 2026-10-29
+* **Autor**: `evjose`
+* **Mensaje de commit**: docs: anadir obligatoriedad de masa realista a componentes en AGENTS.md y openspec
+* **Aporte clave al contexto común**:
+  > Actualización: - Obligatoriedad de masa/peso: todo componente físico modelado debe incluir obligatoriamente su atributo de peso/masa real ('TiposBase::Mass' en kg). Si el usuario no lo define, la IA debe recordárselo, pedírselo o proponer un valor técnicamente plausible.
+* **Líneas añadidas relevantes al bloque `context:`**:
+  * `- Obligatoriedad de masa/peso: todo componente físico modelado debe incluir obligatoriamente su atributo de peso/masa real ('TiposBase::Mass' en kg). Si el usuario no lo define, la IA debe recordárselo, pedírselo o proponer un valor técnicamente plausible.`
 
