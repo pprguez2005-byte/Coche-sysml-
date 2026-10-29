@@ -17,12 +17,12 @@ context: |
   - PROTECCIÓN DE REQUISITOS: Si cualquier petición o componente nuevo requiere modificar, rebajar o eliminar un requisito existente (en 'Modelos/*.sysml' o en 'openspec/specs/'), el agente debe detenerse antes de ejecutar, emitir un fallo/aviso explícito e informar al usuario para que confirme que es consciente de que está modificando un requisito.
 
   Límites y condiciones del proyecto:
-  - El sistema modelado es un vehículo eléctrico ligero muy sencillo (triciclo Tadpole) al que se añade complejidad de forma gradual.
+  - El sistema modelado es un coche / vehículo ligero al que se añade complejidad de forma gradual.
   - El objetivo final es APRENDER las herramientas y asentar un procedimiento de trabajo en equipo, NO diseñar un vehículo ni un robot sofisticado de producción.
   - Alcance acotado: añadir como máximo 2 o 3 componentes o elementos nuevos de prueba por iteración y pocas especificaciones, claras y didácticas.
   - Enfoque pedagógico: todos los integrantes son nuevos en estas herramientas; todas las propuestas, diseños, tareas y modificaciones deben ser muy incrementales y estar muy bien explicadas paso a paso.
-  - Herramientas núcleo: Visual Studio Code en modo texto con archivos .sysml segmentados modularmente en la carpeta Modelos/, controlados con Git, y visualizados principalmente con la extensión Spec42 (SysML v2).
-  - Aunque puntualmente se prueben herramientas externas (Eclipse SysON, CATIA Magic), la fuente de verdad (núcleo) son siempre los archivos de texto .sysml en Git.
+  - Entorno y herramientas obligatorias: Visual Studio Code, Git, OpenSpec CLI ('npm install -g @fission-ai/openspec') para la gestión de especificaciones, y la extensión de Eclipse SysON para la visualización de diagramas en VS Code de forma nativa (sin Docker).
+  - La fuente de verdad (núcleo) son siempre los archivos de texto .sysml en Git.
   - Idioma: redactar todos los artefactos y explicaciones en español técnico.
   - Las temperaturas se miden siempre en grados centígrados (Celsius): los atributos y constraints de tipo Temperature están en °C.
   - Obligatoriedad de masa/peso: todo componente físico modelado debe incluir obligatoriamente su atributo de peso/masa real ('TiposBase::Mass' en kg). Si el usuario no lo define, la IA debe recordárselo, pedírselo o proponer un valor técnicamente plausible.

@@ -1,4 +1,4 @@
----
+﻿---
 name: sysmlv2-skill
 description: SysML v2 systems modeling guidance for creating valid models with correct syntax, proper type hierarchies, and validation workflows. Use when working with .sysml files, systems modeling, architecture documentation, SysON, or Eclipse SysML tools. Provides syntax reference, common patterns, error troubleshooting, and best practices from OMG specifications.
 license: ISC
@@ -74,9 +74,7 @@ filename:line:column: error: message
 
 ## Integration Workflows
 
-**SysON (visual modeling)**: Deploy via Docker (`docker run -p
-8080:8080 eclipsesyson/syson:latest`) or see
-https://doc.mbse-syson.org/
+**SysON (visual modeling)**: Use the Eclipse SysON extension for VS Code or see https://doc.mbse-syson.org/
 
 **Infrastructure-as-Code**: Model in SysML → Validate → Implement in
 Terraform/Pulumi → Verify match

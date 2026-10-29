@@ -1,8 +1,13 @@
-# Instrucciones Obligatorias para Agentes de IA (`AGENTS.md`)
+﻿# Instrucciones Obligatorias para Agentes de IA (`AGENTS.md`)
 
 Este repositorio es un proyecto formativo en equipo para aprender **SysML v2 (modo texto)**, **Git** y **desarrollo guiado por especificaciones con OpenSpec**.
 
 Antes de realizar cualquier modificación en los modelos del proyecto, **DEBES** leer [`openspec/config.yaml`](openspec/config.yaml) y cumplir estrictamente estas reglas:
+
+## 0. Entorno y Herramientas Obligatorias
+- **Visual Studio Code**: Editor oficial del proyecto con archivos .sysml como única fuente de verdad en Git.
+- **OpenSpec CLI**: Herramienta de especificaciones asistida por IA (npm install -g @fission-ai/openspec). El proyecto depende de su CLI para el flujo estructurado de propuestas, deltas y archivado.
+- **Extensión Eclipse SysON** (VS Code): Utilizada para la visualización de diagramas en local de forma nativa, descartando completamente el uso de Docker.
 
 ## 1. Prohibido editar `Modelos/*.sysml` sin pasar por OpenSpec
 - **NUNCA** edites ni crees archivos dentro de `Modelos/` directamente aunque el usuario pida un cambio sobre un componente (ej. *"añade un atributo a la batería"* o *"crea el subsistema de frenos"*).
@@ -22,7 +27,7 @@ Antes de realizar cualquier modificación en los modelos del proyecto, **DEBES**
     - Todo componente físico (`part def` / `part`) modelado en `Modelos/*.sysml` **DEBE** incluir obligatoriamente su atributo de masa/peso tipado con `TiposBase::Mass` (expresado en kilogramos, kg).
     - Los valores asignados deben ser **reales y técnicamente plausibles** para los elementos de un vehículo ligero/triciclo.
     - La IA tiene la **obligación de recordar y pedir activamente** al usuario o colaborador la asignación de este peso si no lo ha proporcionado en su petición o propuesta, sugiriendo un valor realista si es necesario.
-  - Validar siempre la sintaxis SysML v2 y la generación de vistas de **Spec42** antes de dar por completada una implementación.
+  - Validar siempre la sintaxis SysML v2 y la generación de vistas de la extensión **SysON** / **Spec42** antes de dar por completada una implementación.
 
 ## 3. Protección de Requisitos Existentes (Bloqueo y Confirmación)
 - Siempre que un prompt o cambio solicitado implique **modificar, relajar o eliminar un requisito existente** (`requirement def` en `Modelos/*.sysml` o un requisito consolidado en `openspec/specs/`) o introduzca un componente que incumpla un requisito vigente:
