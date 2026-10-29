@@ -1,122 +1,135 @@
-# Guía de Trabajo: OpenSpec en Entornos de Agentes (Antigravity)
+﻿# Guía de Trabajo: OpenSpec en SysML v2 y Entornos con Agentes de IA
 
-## 1. ¿Por qué usamos OpenSpec?
+Bienvenido a la metodología oficial de trabajo del proyecto. Este documento explica cómo colaborar de forma rigurosa y ordenada utilizando **OpenSpec**, **Git** y **SysML v2** asistidos por agentes inteligentes (Antigravity / VS Code).
 
-OpenSpec introduce una metodología guiada por especificaciones (*spec-driven development*) dentro del ciclo asistido por IA, resolviendo los problemas comunes al codificar con agentes:
+---
 
-* **Eliminación de desviaciones y alucinaciones:** Evita que el agente empiece a escribir código sin rumbo o tomando decisiones arbitrarias. Impone una etapa de diseño y lista de tareas antes de modificar archivos.
+> [!IMPORTANT]
+> ### 🛑 Requisito Obligatorio al Iniciar Cada Conversación
+> **Todo cambio o petición sobre los modelos debe comenzar utilizando la herramienta OpenSpec.**
+>
+> Cada vez que abras una conversación con el agente de IA para añadir, modificar o refactorizar cualquier elemento del coche, **DEBES iniciar tu petición invocando OpenSpec** (mediante el comando `/opsx-propose`, `/openspec-propose` o solicitando explícitamente una propuesta OpenSpec).
+>
+> ❌ **Prohibido:** *"Añade un motor de 50kW al coche"* (provoca cambios sin planificar que rompen la sincronización).  
+> ✔️ **Correcto:** *"`/opsx-propose Diseñar el subsistema Powertrain con motor eléctrico de 50 kW, masa estimada de 35 kg y puertos de par`"*.
 
-* **Contexto compartido y sincronizado:** Garantiza que el conocimiento técnico no resida solo en la memoria temporal del chat. Queda registrado en el repositorio para que cualquier compañero (o agente en otra máquina) trabaje sobre la misma base.
+---
 
-* **Trazabilidad en el repositorio:** Cada cambio de arquitectura o funcionalidad genera un historial explícito de decisiones, especificaciones y tareas completadas junto con los commits.
+## 1. ¿Por qué usamos OpenSpec en Ingeniería de Sistemas?
 
-* **Seguridad y modularidad:** Permite planificar y prototipar en especificaciones aisladas (*deltas*) sin romper los esquemas globales del proyecto hasta que la funcionalidad sea estable y validada.
+En el desarrollo de sistemas con SysML v2 asistido por IA, OpenSpec introduce el enfoque **Desarrollo Guiado por Especificaciones (*Spec-Driven Development*)**:
 
-## 2. Flujo de Trabajo Recomendado
+| Desafío sin OpenSpec | Solución con OpenSpec |
+| :--- | :--- |
+| **Alucinaciones y saltos al código:** La IA escribe bloques `.sysml` sin verificar compatibilidad ni balance de masas. | **Fase de diseño previa obligatoria:** El agente debe acordar diseño, especificaciones verificables y tareas antes de tocar un solo archivo. |
+| **Pérdida de contexto en el chat:** Los acuerdos de diseño se pierden al cerrar la ventana de conversación. | **Registro en el repositorio:** Cada requisito y decisión queda registrado en `openspec/` y versionado en Git para todo el equipo. |
+| **Rotura de requisitos existentes:** Cambios rápidos que contradicen condiciones de seguridad o masa máxima. | **Blindaje de requisitos:** Bloqueo de seguridad automático si una propuesta colisiona con un requisito vigente. |
+| **Código desordenado:** Diferentes criterios entre los integrantes del grupo. | **Sincronización de arquitectura:** Vocabulario común y ciclo unificado de trabajo colaborativo. |
 
-Este es el procedimiento estándar para desarrollar una funcionalidad o refactorización desde cero:
+---
 
+## 2. Ciclo de Vida de un Cambio
+
+El siguiente flujo resume las fases secuenciales de cualquier iteración sobre el coche:
+
+```mermaid
+flowchart TD
+    A["🚀 Inicio de Conversación"] --> B["1. /opsx-propose<br/>(Diseño, Specs delta y Tareas)"]
+    B --> C{"2. Revisión del Plan<br/>¿Es correcto y técnicamente viable?"}
+    C -- "Necesita ajustes" --> D["/opsx-update<br/>Ajustar decisiones y tareas"]
+    D --> C
+    C -- "Aprobado por el usuario" --> E["3. /opsx-apply<br/>(Implementación en Modelos/*.sysml)"]
+    E --> F["4. Validación Visual<br/>(Extensión SysON / Spec42)"]
+    F --> G["5. /opsx-sync<br/>(Consolidar requisitos en specs/)"]
+    G --> H["6. /opsx-archive<br/>(Archivar propuesta en historial)"]
+    H --> I["7. Git Commit & Push<br/>(Subir cambios a la rama dedicada)"]
+
+    style A fill:#e0f2fe,stroke:#0284c7,stroke-width:2px
+    style B fill:#fef3c7,stroke:#d97706,stroke-width:2px
+    style C fill:#f3f4f6,stroke:#4b5563,stroke-width:2px
+    style E fill:#dcfce7,stroke:#16a34a,stroke-width:2px
+    style I fill:#ede9fe,stroke:#7c3aed,stroke-width:2px
 ```
-[ Antigravity ]
-       │
-       ▼
-1. /openspec-propose      ──► Define diseño técnico y desglose de tareas
-       │
-       ▼
-2. Revisión del Plan     ──► Ajustes antes de tocar código (/openspec-update-change si aplica)
-       │
-       ▼
-3. /openspec-apply-change ──► El agente implementa el código paso a paso
-       │
-       ▼
-4. /openspec-sync-specs   ──► Sincroniza las specs del cambio con las specs base del proyecto
-       │
-       ▼
-5. /openspec-archive-change ──► Archiva la tarea en el histórico y limpia el estado activo
-       │
-       ▼
-6. Git Commit & Push      ──► Sube el código y las especificaciones a la rama compartida
 
+---
+
+## 3. Guía Paso a Paso con Ejemplos de SysML v2
+
+### Paso 0: Asegurar tu Rama de Trabajo
+Nunca trabajes sobre la rama `main`. Crea siempre una rama temática:
+```bash
+git checkout -b feature/subsistema-frenos
 ```
 
-### Paso a paso:
+### Paso 1: Lanzar la Propuesta al Iniciar la Conversación
+Inicia el diálogo con la IA indicando el comando de propuesta y el alcance concreto:
+```text
+/opsx-propose Modelar el subsistema de Frenos con pinzas hidráulicas, masa de 12 kg y requisito de desaceleración mínima de 6 m/s²
+```
+El agente creará en `openspec/changes/<nombre-cambio>/` cuatro artefactos clave:
+* 📄 **`proposal.md`**: Justificación del cambio y subsistemas involucrados.
+* 📋 **`specs/`**: Requisitos verificables del subsistema en formato delta.
+* 📐 **`design.md`**: Decisiones de modelado SysML v2, puertos y balance de masas.
+* ✅ **`tasks.md`**: Lista ordenada de tareas atómicas para implementar.
 
-1. **Abrir Antigravity en la carpeta del proyecto**
+### Paso 2: Revisar y Ajustar la Planificación
+Revisa los archivos generados en `openspec/changes/`. Si quieres cambiar una masa o añadir un puerto:
+> *"Ajusta la masa a 14 kg y añade un puerto para sensor de desgaste."*  
+*(O utiliza `/opsx-update` para rearmar el plan).*
 
-   No es necesario reiniciar ni reejecutar ningún `init`. El agente detecta automáticamente la configuración existente.
+### Paso 3: Aplicar el Cambio en los Modelos
+Una vez conforme con la planificación, da la orden de implementar:
+```text
+/opsx-apply
+```
+El agente editará o creará los archivos `.sysml` en `Modelos/` cumpliendo estrictamente con la sintaxis OMG SysML v2.
 
-2. **Crear la propuesta técnica**
+### Paso 4: Validar Visualmente en VS Code
+Abre el diagrama con la **extensión SysON** en VS Code para verificar que:
+1. Las cajas y puertos mecánicos/eléctricos están bien definidos.
+2. Las líneas `connect` enlazan los puertos correctos.
+3. No hay errores de tipo ni de importación de paquetes.
 
-   Lanza el comando describiendo el objetivo:
+### Paso 5: Sincronizar y Archivar
+Consolida los nuevos requisitos en la base central y archiva la propuesta:
+```text
+/opsx-sync
+/opsx-archive
+```
 
-   ```
-   /openspec-propose Añade un endpoint POST /auth/login con validación de credenciales y retorno de token JWT.
-   
-   ```
+### Paso 6: Confirmar en Git
+Sube el código y el estado limpio de las especificaciones:
+```bash
+git add .
+git commit -m "feat(frenos): modelado subsistema frenos y requisitos de frenado"
+git push origin feature/subsistema-frenos
+```
 
-   *El agente generará el diseño, las tareas y las especificaciones delta correspondientes.*
+---
 
-3. **Revisar el plan**
+## 4. Catálogo Rápido de Comandos Slash
 
-   Revisa los archivos que el agente planea crear o editar. Si necesitas corregir el alcance antes de programar, coméntaselo en el chat o usa `/openspec-update-change`.
+| Comando | Acción Principal | ¿Cuándo ejecutarlo? |
+| :--- | :--- | :--- |
+| **`/opsx-propose`** | Crea la propuesta técnica, diseño, requisitos y tareas. | **Al inicio de la conversación** para plantear cualquier cambio. |
+| **`/opsx-explore`** | Sesión de diálogo para explorar alternativas o aclarar dudas técnicas. | Cuando no tienes claro el diseño antes de proponerlo. |
+| **`/opsx-apply`** | Ejecuta las tareas en los archivos `Modelos/*.sysml`. | Tras validar y aprobar la propuesta. |
+| **`/opsx-update`** | Actualiza y reconcilia los 4 artefactos de la propuesta activa. | Si necesitas cambiar requisitos o alcance en mitad del cambio. |
+| **`/opsx-sync`** | Copia las especificaciones delta a `openspec/specs/`. | Al terminar la implementación del código. |
+| **`/opsx-archive`** | Mueve el cambio completado a `openspec/changes/archive/`. | Como cierre para dejar limpio el entorno de trabajo. |
 
-4. **Implementar el cambio**
+---
 
-   Ordena al agente que ejecute las tareas planificadas:
+## 5. Preguntas Frecuentes y Buenas Prácticas
 
-   ```
-   /openspec-apply-change
-   
-   ```
+> [!TIP]
+> **¿Qué pasa si olvido especificar la masa de un componente?**  
+> La IA tiene la obligación (por reglas de `AGENTS.md`) de recordártelo y sugerir un peso físicamente verosímil tipado con `TiposBase::Mass` en kilogramos.
 
-   *El agente modificará y creará el código fuente en el proyecto.*
+> [!WARNING]
+> **¿Puedo pedirle al agente que edite `Modelos/` directamente sin OpenSpec?**  
+> **No.** El agente tiene orden estricta de rechazar o redirigir cualquier edición directa de modelos hacia una propuesta de OpenSpec. Esto previene desincronizaciones entre el equipo y roturas silenciosas de modelos.
 
-5. **Actualizar el contexto para el equipo**
-
-   Una vez que el código funciona y las pruebas pasan, traslada las definiciones técnicas a la base global:
-
-   ```
-   /openspec-sync-specs
-   
-   ```
-
-6. **Archivar la tarea finalizada**
-
-   Cierra el ciclo de la tarea para mantener limpio el entorno de trabajo:
-
-   ```
-   /openspec-archive-change
-   
-   ```
-
-7. **Publicar en Git**
-
-   Envía los cambios de código y de contexto al repositorio:
-
-   ```
-   git add .
-   git commit -m "feat(auth): implementar endpoint /auth/login con jwt"
-   git push origin <tu-rama>
-   
-   ```
-
-## 3. Catálogo de Comandos Slash
-
-| Comando | Función principal | ¿Cuándo utilizarlo? | 
-| ----- | ----- | ----- | 
-| **`/openspec-propose`** | Diseña y genera la propuesta completa en un solo paso (diseño, especificaciones y lista de tareas). | Al iniciar cualquier nueva funcionalidad o refactorización relevante. | 
-| **`/openspec-explore`** | Inicia un modo de análisis y diálogo para clarificar dudas o investigar requisitos técnicos. | Antes de proponer un cambio, cuando la solución técnica aún es incierta. | 
-| **`/openspec-apply-change`** | Aplica secuencialmente las tareas planificadas en el código fuente. | Cuando la propuesta técnica ha sido revisada y está lista para implementarse. | 
-| **`/openspec-update-change`** | Revisa y reconcilia los artefactos de planificación si cambian las decisiones iniciales. | Durante el desarrollo, si descubres nuevos requisitos o cambias la arquitectura. | 
-| **`/openspec-sync-specs`** | Integra las especificaciones delta del cambio en las especificaciones centrales del proyecto. | Al terminar o estabilizar la implementación, para que tus compañeros tengan el contexto al día. | 
-| **`/openspec-archive-change`** | Finaliza y archiva el cambio implementado dentro del histórico del proyecto. | Una vez concluida y probada toda la tarea, como paso de cierre. | 
-
-## 4. Preguntas Frecuentes
-
-### ¿Puedo pedirle cosas al agente sin usar comandos de OpenSpec?
-
-**Sí.** El agente puede editar código libremente mediante lenguaje natural. Sin embargo, para cambios estructurales o nuevos endpoints, no usar el flujo de OpenSpec provoca que las especificaciones del repositorio queden desactualizadas respecto al código, perdiendo alineación con el equipo.
-
-### ¿Tengo que inicializar OpenSpec cada día?
-
-**No.** `init` solo se ejecuta una vez en la vida del proyecto. Todo el estado y la configuración quedan persistidos en los archivos del directorio y en Git.
+> [!NOTE]
+> **¿Es necesario ejecutar `openspec init` cada vez?**  
+> **No.** El repositorio ya está inicializado. Solo necesitas abrir la carpeta en VS Code y lanzar `/opsx-propose`.
