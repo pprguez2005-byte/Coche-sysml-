@@ -155,6 +155,13 @@ const ARCHIVOS_REPOSITORIO = [
     descripcion: "Documentación principal y guía didáctica del proyecto",
     autorId: "cesar",
     tipo: "Markdown"
+  },
+  {
+    path: "GUIA_TOKEN_GITHUB.md",
+    categoria: "docs/",
+    descripcion: "Guía didáctica sobre el Token de Acceso Personal (PAT) de GitHub",
+    autorId: "pelayo",
+    tipo: "Markdown"
   }
 ];
 
@@ -258,6 +265,51 @@ function mostrarSeccion(idSeccion) {
 }
 
 // ====================================================================
+// GESTIÓN DE TOKEN PERSONAL DE GITHUB (PAT)
+// ====================================================================
+function obtenerGitHubToken() {
+  return localStorage.getItem("sysml_github_token") || "";
+}
+
+function guardarGitHubToken(token) {
+  if (token && token.trim()) {
+    localStorage.setItem("sysml_github_token", token.trim());
+  } else {
+    localStorage.removeItem("sysml_github_token");
+  }
+  actualizarUIModalToken();
+}
+
+function eliminarGitHubToken() {
+  localStorage.removeItem("sysml_github_token");
+  actualizarUIModalToken();
+  mostrarToast("Token eliminado. Modo lectura activa.", "info");
+}
+
+function actualizarUIModalToken() {
+  const token = obtenerGitHubToken();
+  const input = document.getElementById("input-github-token");
+  const badge = document.getElementById("badge-token-status");
+  const btnEliminar = document.getElementById("btn-eliminar-token");
+
+  if (input) {
+    input.value = token ? "••••••••••••••••••••••••••••••••" : "";
+  }
+  if (badge) {
+    if (token) {
+      badge.textContent = "Token activo (Lectura y Escritura)";
+      badge.className = "text-[#34c759] font-medium";
+    } else {
+      badge.textContent = "Sin token (Modo lectura)";
+      badge.className = "text-[#86868b] font-mono";
+    }
+  }
+  if (btnEliminar) {
+    btnEliminar.classList.toggle("hidden", !token);
+  }
+}
+
+// ====================================================================
 // CARGA DE DATOS DE LA API DE GITHUB (MÉTRICAS, COMMITS Y TAREAS)
 // ====================================================================
 async function inicializarDatos() {
@@ -306,6 +358,10 @@ async function fetchConCache(url) {
   const headers = {
     "Accept": "application/vnd.github.v3+json"
   };
+  const token = obtenerGitHubToken();
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
 
   const res = await fetch(url, { headers });
   if (!res.ok) throw new Error(`HTTP error ${res.status}`);
@@ -707,9 +763,13 @@ function obtenerTareasPorDefecto() {
 }
 
 async function cargarTareasDesdeGitHub() {
+  const token = obtenerGitHubToken();
   const headers = {
     "Accept": "application/vnd.github.v3+json"
   };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
 
   const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues?state=all&per_page=100`;
   const cacheKey = "cache_gh_issues";
@@ -957,7 +1017,31 @@ async function conmutarEstadoTarea(tarea) {
   renderizarTareas();
 
   if (tarea.origen === "github" && tarea.numero) {
-    mostrarToast(`Estado cambiado en vista. Para registrarlo en GitHub: <a href="${tarea.url}" target="_blank" class="underline font-bold text-white">Cerrar Issue #${tarea.numero} ↗</a>`, "info");
+    const token = obtenerGitHubToken();
+    if (token) {
+      try {
+        const stateStr = nuevoEstado ? "closed" : "open";
+        const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${tarea.numero}`, {
+          method: "PATCH",
+          headers: {
+            "Accept": "application/vnd.github.v3+json",
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ state: stateStr })
+        });
+        if (res.ok) {
+          sessionStorage.removeItem("cache_gh_issues");
+          mostrarToast(nuevoEstado ? `Issue #${tarea.numero} cerrado en GitHub` : `Issue #${tarea.numero} reabierto`, "exito");
+          return;
+        }
+      } catch (e) {
+        console.warn("Error conmutando estado en GitHub:", e);
+      }
+    }
+
+    // Si no hay token configurado
+    mostrarToast(`Estado cambiado localmente. Para guardarlo en GitHub, abre el <a href="${tarea.url}" target="_blank" class="underline font-bold text-white">Issue #${tarea.numero}</a>`, "info");
   } else {
     guardarTareasLocales();
   }
@@ -976,38 +1060,190 @@ function eliminarTarea(tarea) {
 
 async function procesarCreacionTarea(texto, miembroId) {
   const miembro = EQUIPO_CANONICO.find(m => m.id === miembroId) || EQUIPO_CANONICO[0];
+  const token = obtenerGitHubToken();
 
-  const bodyTexto = `Tarea asignada desde el Panel de Control Web a @${miembro.loginPrincipal}.\n\n- **Responsable:** ${miembro.nombre} (@${miembro.loginPrincipal})\n\n_Registrada colaborativamente mediante la interfaz del Coche SysML v2._`;
-  const urlIssue = `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/new?title=${encodeURIComponent(texto)}&body=${encodeURIComponent(bodyTexto)}&labels=tarea&assignees=${encodeURIComponent(miembro.loginPrincipal)}`;
+  if (token) {
+    try {
+      mostrarToast("Creando tarea en GitHub Issues...", "info");
+      const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues`, {
+        method: "POST",
+        headers: {
+          "Accept": "application/vnd.github.v3+json",
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          title: texto,
+          body: `Tarea asignada desde el Panel de Control Web a @${miembro.loginPrincipal}.\n\n- **Responsable:** ${miembro.nombre} (@${miembro.loginPrincipal})\n\n_Registrada colaborativamente mediante la interfaz del Coche SysML v2._`,
+          assignees: [miembro.loginPrincipal],
+          labels: ["tarea"]
+        })
+      });
 
-  window.open(urlIssue, "_blank");
+      if (res.ok) {
+        sessionStorage.removeItem("cache_gh_issues");
+        mostrarToast("¡Tarea creada en GitHub y visible para todo el equipo!", "exito");
+        await cargarTareas();
+        return;
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        mostrarToast(`Aviso GitHub: ${errorData.message || res.statusText}`, "error");
+      }
+    } catch (err) {
+      mostrarToast("Error de conexión al crear en GitHub", "error");
+    }
+  }
 
-  // Añadir de forma provisional en la vista hasta la sincronización remota
-  const tareaProvisional = {
-    id: "t_" + Date.now(),
-    numero: null,
-    texto: texto,
-    miembroId: miembro.id,
-    completada: false,
-    fecha: "Pendiente en GitHub",
-    url: `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues`,
-    origen: "local"
-  };
-  estadoApp.tareas.unshift(tareaProvisional);
-  guardarTareasLocales();
-  renderizarTareas();
+  // Si no hay token configurado o falló: abrir opciones asistidas
+  abrirModalOpcionesCreacion(texto, miembro);
+}
 
-  mostrarToast(`Abriendo GitHub para confirmar la tarea asignada a ${miembro.nombre}... Pulsa 'Submit new issue' para publicar.`, "info");
+function abrirModalOpcionesCreacion(texto, miembro) {
+  estadoApp.tareaPendienteCrear = { texto, miembro };
+
+  const modal = document.getElementById("modal-crear-opciones");
+  const resumen = document.getElementById("modal-crear-resumen");
+  if (resumen) {
+    resumen.innerHTML = `Asignar: <strong class="text-[#1d1d1f]">"${escapeHtml(texto)}"</strong> a <strong class="text-[#0071e3]">${miembro.nombre}</strong>.`;
+  }
+  if (modal) modal.classList.remove("hidden");
 }
 
 function configurarModalesYEventos() {
+  // Modal de Ajustes Sync
+  const btnSyncAjustes = document.getElementById("btn-sync-ajustes");
+  const modalSync = document.getElementById("modal-sync-ajustes");
+  const btnCerrarModalSync = document.getElementById("btn-cerrar-modal-sync");
+  const btnGuardarToken = document.getElementById("btn-guardar-token");
+  const btnEliminarToken = document.getElementById("btn-eliminar-token");
+  const btnForzarRecarga = document.getElementById("btn-forzar-recarga-modal");
   const btnBannerSync = document.getElementById("btn-banner-forzar-sync");
+
+  if (btnSyncAjustes && modalSync) {
+    btnSyncAjustes.addEventListener("click", () => {
+      actualizarUIModalToken();
+      modalSync.classList.remove("hidden");
+    });
+  }
+
+  if (btnCerrarModalSync && modalSync) {
+    btnCerrarModalSync.addEventListener("click", () => {
+      modalSync.classList.add("hidden");
+    });
+  }
+
+  if (btnGuardarToken) {
+    btnGuardarToken.addEventListener("click", async () => {
+      const input = document.getElementById("input-github-token");
+      const valor = input.value.trim();
+      if (valor && !valor.startsWith("•••")) {
+        guardarGitHubToken(valor);
+        mostrarToast("Token guardado de forma privada en tu navegador", "exito");
+      }
+      modalSync.classList.add("hidden");
+      sessionStorage.clear();
+      await cargarTareas();
+    });
+  }
+
+  if (btnEliminarToken) {
+    btnEliminarToken.addEventListener("click", () => {
+      eliminarGitHubToken();
+      modalSync.classList.add("hidden");
+    });
+  }
+
+  if (btnForzarRecarga) {
+    btnForzarRecarga.addEventListener("click", async () => {
+      sessionStorage.removeItem("cache_gh_issues");
+      await cargarTareas();
+      mostrarToast("Tareas actualizadas desde GitHub", "info");
+      modalSync.classList.add("hidden");
+    });
+  }
 
   if (btnBannerSync) {
     btnBannerSync.addEventListener("click", async () => {
       sessionStorage.removeItem("cache_gh_issues");
       await cargarTareas();
       mostrarToast("Tareas sincronizadas", "info");
+    });
+  }
+
+  // Modal de Opciones al Crear
+  const modalCrear = document.getElementById("modal-crear-opciones");
+  const btnCerrarCrear = document.getElementById("btn-cerrar-modal-crear");
+  const btnCrearGithub = document.getElementById("btn-modal-crear-github");
+  const btnConfigurarToken = document.getElementById("btn-modal-configurar-token");
+  const btnGuardarLocal = document.getElementById("btn-modal-guardar-local");
+
+  if (btnCerrarCrear && modalCrear) {
+    btnCerrarCrear.addEventListener("click", () => {
+      modalCrear.classList.add("hidden");
+    });
+  }
+
+  if (btnCrearGithub && modalCrear) {
+    btnCrearGithub.addEventListener("click", () => {
+      const p = estadoApp.tareaPendienteCrear;
+      if (!p) return;
+
+      const bodyTexto = `Tarea asignada desde el Panel de Control Web a @${p.miembro.loginPrincipal}.\n\n- **Responsable:** ${p.miembro.nombre}`;
+      const urlIssue = `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/new?title=${encodeURIComponent(p.texto)}&body=${encodeURIComponent(bodyTexto)}&labels=tarea&assignees=${encodeURIComponent(p.miembro.loginPrincipal)}`;
+      
+      window.open(urlIssue, "_blank");
+
+      // Añadir de forma provisional en local
+      const tareaProvisional = {
+        id: "t_" + Date.now(),
+        numero: null,
+        texto: p.texto,
+        miembroId: p.miembro.id,
+        completada: false,
+        fecha: "Pendiente en GitHub",
+        url: `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues`,
+        origen: "local"
+      };
+      estadoApp.tareas.unshift(tareaProvisional);
+      guardarTareasLocales();
+      renderizarTareas();
+
+      modalCrear.classList.add("hidden");
+      mostrarToast("Ventana de GitHub abierta. Pulsa 'Submit new issue' para publicar para todos.", "info");
+    });
+  }
+
+  if (btnConfigurarToken && modalCrear) {
+    btnConfigurarToken.addEventListener("click", () => {
+      modalCrear.classList.add("hidden");
+      if (modalSync) {
+        actualizarUIModalToken();
+        modalSync.classList.remove("hidden");
+      }
+    });
+  }
+
+  if (btnGuardarLocal && modalCrear) {
+    btnGuardarLocal.addEventListener("click", () => {
+      const p = estadoApp.tareaPendienteCrear;
+      if (!p) return;
+
+      const tareaLocal = {
+        id: "t_" + Date.now(),
+        numero: null,
+        texto: p.texto,
+        miembroId: p.miembro.id,
+        completada: false,
+        fecha: "Hoy",
+        url: null,
+        origen: "local"
+      };
+      estadoApp.tareas.unshift(tareaLocal);
+      guardarTareasLocales();
+      renderizarTareas();
+
+      modalCrear.classList.add("hidden");
+      mostrarToast("Tarea guardada solo en este ordenador", "info");
     });
   }
 }
